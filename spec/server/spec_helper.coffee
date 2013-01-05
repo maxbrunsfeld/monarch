@@ -1,5 +1,7 @@
 _ = require 'underscore'
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 500
+
 beforeEach ->
   Monarch.configureConnection(databaseConfig)
   @addMatchers
