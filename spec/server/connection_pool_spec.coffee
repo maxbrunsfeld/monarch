@@ -7,7 +7,7 @@ describe "ConnectionPool", ->
   beforeEach ->
     connectionPool = new ConnectionPool
 
-  describe ".query", ->
+  describe "#query", ->
     describe "when the connection is not configured", ->
       it "calls the callback with an error indicating the missing options", (done) ->
         connectionPool.query 'select 1', (err, result) ->
@@ -39,4 +39,81 @@ describe "ConnectionPool", ->
           connectionPool.query 'select 1 as "one"', (err, result) ->
             expect(err).toBeNull()
             expect(result.rows).toEqual([{one: 1}])
+            done()
+
+  describe "#begin", ->
+    beforeEach (done) ->
+      connectionPool.configure(databaseConfig)
+      connectionPool.query('TRUNCATE TABLE "blogs"', done)
+
+    describe "when a connection is successfully established", ->
+      it "calls the callback with a database connection retrieved from the pool", (done) ->
+        connectionPool.begin (err, transaction) ->
+          transaction.query 'select 1 as "one"', (err, result) ->
+            expect(result.rows).toEqual([{one: 1}])
+            transaction.end()
+            done()
+
+    describe "when there is a connection error", ->
+      beforeEach ->
+        connectionPool.configure(
+          _.extend({}, databaseConfig, host: 'totally-wrong'))
+
+      it "calls the callback the error", (done) ->
+        connectionPool.begin (err, transaction) ->
+          expect(transaction).toBeUndefined()
+          expect(err.message).toMatch(/getaddrinfo/)
+          done()
+
+    describe "Transaction#query", ->
+      transaction = null
+
+      beforeEach (done) ->
+        connectionPool.begin (err, tx) ->
+          transaction = tx
+          transaction.query("""
+            INSERT INTO "blogs"
+              ("title")
+            VALUES
+              ('In transaction');
+          """, done)
+
+      it "makes changes that are visible within the transaction", (done) ->
+        transaction.query 'SELECT * FROM "blogs"', (err, result) ->
+          expect(result.rows).toEqual([
+            title: 'In transaction',
+            id: null
+            author_id: null
+            public: null
+          ])
+          transaction.end()
+          done()
+
+      it "makes changes that aren't visible to other connections in the pool", (done) ->
+        connectionPool.query 'SELECT * FROM "blogs"', (err, result) ->
+          expect(result.rows).toEqual([])
+          transaction.end()
+          done()
+
+      describe "Transaction#commit", ->
+        beforeEach (done) ->
+          transaction.commit(done)
+
+        it "commits the changes made in the transaction", (done) ->
+          connectionPool.query 'SELECT * FROM "blogs"', (err, result) ->
+            expect(result.rows).toEqual([
+              title: 'In transaction',
+              id: null
+              author_id: null
+              public: null
+            ])
+            done()
+
+      describe "Transaction#rollback", ->
+        beforeEach (done) ->
+          transaction.rollBack(done)
+
+        it "rolls back the changes made in the transaction", (done) ->
+          connectionPool.query 'SELECT * FROM "blogs"', (err, result) ->
+            expect(result.rows).toEqual([])
             done()
