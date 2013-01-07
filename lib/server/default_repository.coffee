@@ -1,2 +1,3 @@
 Repository = require "./repository"
-module.exports = new Repository
+ConnectionPool = require "./connection_pool"
+module.exports = new Repository(new ConnectionPool)
