@@ -4,8 +4,7 @@ Monarch.Repository =
   tables: {}
   pauseCount: 0
 
-  buildTable: (recordClass) ->
-    table = new Monarch.Relations.Table(recordClass)
+  registerTable: (table) ->
     @tables[table.name] = table
 
   update: (hashOrArray) ->

@@ -1,4 +1,7 @@
 Monarch.Record.reopen ->
+  @repository = ->
+    Monarch.Repository
+
   for methodName in ['fetch', 'findOrFetch']
     do (methodName) =>
       this[methodName] = ->

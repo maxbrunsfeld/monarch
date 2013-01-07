@@ -2,8 +2,12 @@ class Monarch.Record extends Monarch.Base
   { singularize, capitalize, uncapitalize, underscoreAndPluralize } = Monarch.Util.Inflection
 
   @extended: (subclass) ->
-    subclass.table = Monarch.Repository.buildTable(subclass)
     subclass.defineColumnAccessor('id')
+    subclass.table = new Monarch.Relations.Table(subclass)
+    @repository().registerTable(subclass.table)
+
+  @tables: ->
+    @repository().tables
 
   @resourceUrl: (name) ->
     Monarch.resourceUrlRoot + '/' + @resourceName(name)
@@ -31,7 +35,7 @@ class Monarch.Record extends Monarch.Base
     foreignKey = options.foreignKey ? uncapitalize(@table.name) + "Id"
 
     @relatesTo name, ->
-      target = Monarch.Repository.tables[targetClassName]
+      target = @tables()[targetClassName]
       conditions = _.extend({}, options.conditions or {})
 
       if options.through
@@ -54,7 +58,7 @@ class Monarch.Record extends Monarch.Base
     targetClassName = options.className ? capitalize(name)
     foreignKey = options.foreignKey ? name + "Id"
     @prototype[name] = ->
-      target = Monarch.Repository.tables[targetClassName]
+      target = @tables()[targetClassName]
       target.find(this[foreignKey]())
     this
 
@@ -208,3 +212,6 @@ class Monarch.Record extends Monarch.Base
 
   toString: ->
     "<" + @constructor.displayName + " " + JSON.stringify(@fieldValues()) + ">"
+
+  tables: ->
+    @constructor.tables()

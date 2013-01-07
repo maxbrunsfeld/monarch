@@ -1,10 +1,9 @@
 _ = require "underscore"
 Monarch = require './core'
-connection = require './default_connection_pool'
+{ connection } = require('./default_repository')
 
 _.extend Monarch,
   resourceUrlSeparator: '_'
-  ConnectionPool: require "./connection_pool"
   Schema: require "./schema"
 
   configureConnection: (args...) ->

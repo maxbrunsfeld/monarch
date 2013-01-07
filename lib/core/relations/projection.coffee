@@ -1,6 +1,6 @@
 class Monarch.Relations.Projection extends Monarch.Relations.Relation
   @deriveEquality 'operand', 'table'
-  @delegate 'getColumn', 'inferJoinColumns', 'columns', to: 'table'
+  @delegate 'getColumn', 'inferJoinColumns', 'columns', 'repository', to: 'table'
 
   constructor: (@operand, table) ->
     @table = if _.isFunction(table) then table.table else table

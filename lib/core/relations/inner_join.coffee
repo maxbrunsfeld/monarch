@@ -1,5 +1,6 @@
 class Monarch.Relations.InnerJoin extends Monarch.Relations.Relation
   @deriveEquality 'left', 'right', 'predicate'
+  @delegate 'repository', to: 'left'
 
   constructor: (left, right, predicate) ->
     @left = if _.isFunction(left) then left.table else left

@@ -1,6 +1,11 @@
+defaultRepository = require "./default_repository"
+
 module.exports = (Record) ->
 
   Record.reopen ->
+    @repository = ->
+      defaultRepository
+
     for methodName in ['deleteAll', 'create']
       do (methodName) =>
         this[methodName] = ->

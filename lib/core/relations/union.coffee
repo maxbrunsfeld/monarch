@@ -1,6 +1,6 @@
 class Monarch.Relations.Union extends Monarch.Relations.Relation
   @deriveEquality 'left', 'right'
-  @delegate 'getColumn', 'inferJoinColumns', 'columns', to: 'left'
+  @delegate 'getColumn', 'inferJoinColumns', 'columns', 'repository', to: 'left'
 
   constructor: (left, right) ->
     @left = left

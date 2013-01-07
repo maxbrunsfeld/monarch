@@ -1,19 +1,34 @@
-{ Monarch, async, pg } = require "./spec_helper"
+{ Monarch, async, pg, root } = require "./spec_helper"
+defaultRepository = require "#{root}/default_repository"
 
 describe "Record", ->
-  class Blog extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      authorId: 'integer'
+  Blog = null
 
   beforeEach (done) ->
+    defaultRepository.clear()
+
+    class Blog extends Monarch.Record
+      @extended(this)
+      @columns
+        public: 'boolean'
+        title: 'string'
+        authorId: 'integer'
+
     Blog.deleteAll ->
       Blog.create [
         { id: 1, public: true, title: 'Public Blog1', authorId: 1 },
         { id: null, public: true, title: 'Public Blog2', authorId: 1 },
       ], done
+
+  describe ".extended(subclass)", ->
+    it "associates the subclass with a table in the default repository", ->
+      expect(Blog.name).toBe('Blog')
+      expect(Blog.table instanceof Monarch.Relations.Table).toBeTruthy()
+      expect(Blog.table.name).toBe('Blog')
+      expect(Blog.table).toBe(defaultRepository.tables.Blog)
+
+    it "automatically defines an integer-typed id column", ->
+      expect(Blog.table.getColumn('id').type).toBe('integer')
 
   describe "#isPersisted", ->
     it "returns true when the record has an id", ->

@@ -1,7 +1,6 @@
 _ = require "underscore"
 SelectBuilder = require "../sql/select_builder"
 TupleBuilder = require "../tuple_builder"
-connection = require "../default_connection_pool"
 
 module.exports = (Relation) ->
 
@@ -27,4 +26,4 @@ module.exports = (Relation) ->
         f(err, results?[0])
 
     connection: ->
-      connection
+      @repository().connection
