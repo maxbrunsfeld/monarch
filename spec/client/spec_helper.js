@@ -24,10 +24,6 @@ beforeEach(function() {
 });
 
 afterEach(function() {
-  _.each(Monarch.Record.subclasses, function(recordSubclass) {
-    delete window[recordSubclass.displayName];
-  });
-  Monarch.Record.subclasses = [];
   Monarch.Repository.clear();
   Monarch.snakeCase = false;
 });
