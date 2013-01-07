@@ -211,7 +211,9 @@ class Monarch.Record extends Monarch.Base
     this if @table.name == tableName
 
   toString: ->
-    "<" + @constructor.displayName + " " + JSON.stringify(@fieldValues()) + ">"
+    attrStrings = for name, value of @fieldValues()
+      "#{name}: #{JSON.stringify(value)}"
+    "<#{@constructor.name} #{attrStrings.join(', ')}>"
 
   tables: ->
     @constructor.tables()

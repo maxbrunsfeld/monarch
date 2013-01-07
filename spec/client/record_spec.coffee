@@ -720,3 +720,8 @@ describe "Monarch.Record", ->
         expect(relation.operand.name).toBe('blog-posts')
         expect(relation.predicate.leftOperand.name).toBe('id')
         expect(relation.predicate.rightOperand.value).toBe(1)
+
+    describe "#toString", ->
+      it "displays the record's class and field values", ->
+        blogPost = new BlogPost(blogId: 1, title: 'Alpha', body: 'Charlie')
+        expect(blogPost.toString()).toBe('<BlogPost id: null, blogId: 1, title: "Alpha", body: "Charlie">')
