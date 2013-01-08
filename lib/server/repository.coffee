@@ -5,26 +5,34 @@ class Repository
     @tables={}
 
   registerTable: (table) ->
+    setRepository(table, this)
     @tables[table.name] = table
 
   clone: (connection) ->
-    clone = new Repository(connection)
+    newRepository = new Repository(connection)
     for tableName, table of this.tables
-      clone.tables[tableName] = cloneTable(table, clone)
-    clone
+      newRepository.registerTable(cloneTable(table))
+    newRepository
 
   clear: ->
     @tables = {}
 
-cloneTable = (table, repository) ->
-  clone = _.clone(table)
-  _.extend clone,
-    recordClass: cloneRecordClass(table.recordClass, repository)
+cloneTable = (table) ->
+  newRecordClass = cloneClass(table.recordClass)
+  newTable = new (table.constructor)(newRecordClass)
+  newRecordClass.table = newTable
+  _.extend newTable, table, { recordClass: newRecordClass }
 
-cloneRecordClass = (klass, repository) ->
-  clone = -> klass.apply(this, arguments)
-  _.extend clone, klass,
-    prototype: klass.prototype
-    repository: -> repository
+setRepository = (table, repository) ->
+  table.recordClass.repository = -> repository
+
+cloneClass = (klass) ->
+  newKlass = cloneNamedFunction(klass)
+  dummyConstructor = _.extend((->), prototype: klass.prototype)
+  newKlass.prototype = _.extend((new dummyConstructor), klass.prototype, constructor: newKlass)
+  _.extend newKlass, klass
+
+cloneNamedFunction = (f) ->
+  eval("function #{f.name}() { return f.apply(this, arguments); } #{f.name}")
 
 module.exports = Repository

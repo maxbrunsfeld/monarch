@@ -1,7 +1,6 @@
-{ Monarch, root } = require "./spec_helper"
+{ Monarch, root, _ } = require "./spec_helper"
 Repository = require "#{root}/repository"
 ConnectionPool = require "#{root}/connection_pool"
-defaultRepository = require "#{root}/default_repository"
 
 describe "Repository", ->
   repository = null
@@ -28,6 +27,11 @@ describe "Repository", ->
       repository.registerTable(Blog.table)
       expect(repository.tables.Blog).toBe(Blog.table)
 
+    it "makes the repository the table's repository", ->
+      repository.registerTable(Blog.table)
+      expect(Blog.repository()).toBe(repository)
+      expect(Blog.table.repository()).toBe(repository)
+
   describe "#clone", ->
     [clone, connection] = []
 
@@ -35,7 +39,6 @@ describe "Repository", ->
       repository.registerTable(Blog.table)
       repository.registerTable(BlogPost.table)
       connection = new ConnectionPool
-
       clone = repository.clone(connection)
 
     it "returns a repository", ->
@@ -45,15 +48,19 @@ describe "Repository", ->
       expect(clone.connection).toBe(connection)
 
     it "copies the original repository's tables", ->
+      expect(clone.tables.Blog).toBeA(Monarch.Relations.Table)
       expect(clone.tables.Blog.name).toBe('Blog')
-      expect(clone.tables.BlogPost.name).toBe('BlogPost')
       expect(clone.tables.Blog.columnsByName).toEqual(Blog.table.columnsByName)
+      expect(clone.tables.BlogPost).toBeA(Monarch.Relations.Table)
+      expect(clone.tables.BlogPost.name).toBe('BlogPost')
       expect(clone.tables.BlogPost.columnsByName).toEqual(BlogPost.table.columnsByName)
 
     it "gives each table a copy of the original table's record class", ->
       Blog2 = clone.tables.Blog.recordClass
-      expect(new Blog2).toBeA(Blog)
-      expect(new Blog).toBeA(Blog2)
+      expect(Blog2).not.toBe(Blog)
+      blog2 = new Blog2
+      expect(blog2).toBeA(Blog2)
+      expect(blog2.constructor).toBe(Blog2)
       expect(Blog2.create).toBe(Blog.create)
       expect(Blog2.updateAll).toBe(Blog.updateAll)
 
@@ -70,8 +77,8 @@ describe "Repository", ->
       expect(clone.tables.BlogPost.recordClass.repository()).toBe(clone)
 
     it "does not alter the original repository's tables", ->
-      expect(Blog.repository()).toBe(defaultRepository)
-      expect(BlogPost.repository()).toBe(defaultRepository)
-      expect(Blog.table.repository()).toBe(defaultRepository)
-      expect(BlogPost.table.repository()).toBe(defaultRepository)
+      expect(Blog.repository()).toBe(repository)
+      expect(BlogPost.repository()).toBe(repository)
+      expect(Blog.table.repository()).toBe(repository)
+      expect(BlogPost.table.repository()).toBe(repository)
 
