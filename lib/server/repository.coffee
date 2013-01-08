@@ -8,6 +8,12 @@ class Repository
     setRepository(table, this)
     @tables[table.name] = table
 
+  recordClasses: ->
+    recordClasses = {}
+    for name, table of @tables
+      recordClasses[name] = table.recordClass
+    recordClasses
+
   clone: (connection) ->
     newRepository = new Repository(connection)
     for tableName, table of this.tables

@@ -1,5 +1,7 @@
 { Monarch, async, pg, root } = require "./spec_helper"
 defaultRepository = require "#{root}/default_repository"
+Repository = require "#{root}/repository"
+Transaction = require "#{root}/transaction"
 
 describe "Record", ->
   Blog = null
@@ -29,6 +31,42 @@ describe "Record", ->
 
     it "automatically defines an integer-typed id column", ->
       expect(Blog.table.getColumn('id').type).toBe('integer')
+
+  describe ".transaction", ->
+    [repository, TransactionBlog] = []
+
+    beforeEach (done) ->
+      repository = new Repository(defaultRepository.connection)
+      repository.registerTable(Blog.table)
+      Blog.transaction (err, { Blog }) ->
+        TransactionBlog = Blog
+        Blog.create({ id: 5, title: 'In transaction' }, done)
+
+    it "starts a transaction, passing a set of record classes that use the transaction", (done) ->
+      async.parallel([
+        (f) ->
+          TransactionBlog.find 5, (err, blog) ->
+            expect(blog.title()).toBe('In transaction')
+            f()
+        (f) ->
+          Blog.find 5, (err, blog) ->
+            expect(blog).toBeUndefined()
+            f()
+      ], done)
+
+    describe ".commit", ->
+      it "commits the transaction", (done) ->
+        TransactionBlog.commit ->
+          Blog.find 5, (err, blog) ->
+            expect(blog.title()).toBe('In transaction')
+            done()
+
+    describe ".rollBack", ->
+      it "commits the transaction", (done) ->
+        TransactionBlog.rollBack ->
+          Blog.find 5, (err, blog) ->
+            expect(blog).toBeUndefined()
+            done()
 
   describe "#isPersisted", ->
     it "returns true when the record has an id", ->
