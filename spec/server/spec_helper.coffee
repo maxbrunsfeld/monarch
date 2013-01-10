@@ -64,8 +64,13 @@ recordArrayMatcherMessage = (records, n) ->
 recordMatcherMessage = (record, recordClass, attrs) ->
   unless record instanceof recordClass
     return "\nExpected this record:  #{record}\nto be an instance of #{recordClass.name}.\n"
-  unless _.isEqual(record.fieldValues(), attrs)
+  unless isHashSubset(attrs, record.fieldValues())
     return "\nExpected this record:  #{record}\nto have these attributes:  #{JSON.stringify(attrs)}\n"
+
+isHashSubset = (subhash, hash) ->
+  for key, value of subhash
+    return false unless value == hash[key]
+  true
 
 normalizeSql = (string) ->
   string

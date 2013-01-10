@@ -44,7 +44,7 @@ describe "ConnectionPool", ->
   describe "#begin", ->
     beforeEach (done) ->
       connectionPool.configure(databaseConfig)
-      connectionPool.query('TRUNCATE TABLE "blogs"', done)
+      connectionPool.query('DELETE FROM "blogs"', done)
 
     describe "when a connection is successfully established", ->
       it "calls the callback with a database connection retrieved from the pool", (done) ->
@@ -80,12 +80,9 @@ describe "ConnectionPool", ->
 
       it "makes changes that are visible within the transaction", (done) ->
         transaction.query 'SELECT * FROM "blogs"', (err, result) ->
-          expect(result.rows).toEqual([
-            title: 'In transaction',
-            id: null
-            author_id: null
-            public: null
-          ])
+
+          expect(result.rows.length).toBe(1)
+          expect(result.rows[0].title).toBe('In transaction')
           transaction.end()
           done()
 
@@ -101,12 +98,8 @@ describe "ConnectionPool", ->
 
         it "commits the changes made in the transaction", (done) ->
           connectionPool.query 'SELECT * FROM "blogs"', (err, result) ->
-            expect(result.rows).toEqual([
-              title: 'In transaction',
-              id: null
-              author_id: null
-              public: null
-            ])
+            expect(result.rows.length).toBe(1)
+            expect(result.rows[0].title).toBe('In transaction')
             done()
 
       describe "Transaction#rollback", ->

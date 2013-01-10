@@ -18,8 +18,8 @@ describe "Record", ->
 
     Blog.deleteAll ->
       Blog.create [
-        { id: 1, public: true, title: 'Public Blog1', authorId: 1 },
-        { id: null, public: true, title: 'Public Blog2', authorId: 1 },
+        { public: true, title: 'Public Blog1', authorId: 1 },
+        { public: true, title: 'Public Blog2', authorId: 1 },
       ], done
 
   describe ".extended(subclass)", ->
@@ -40,16 +40,16 @@ describe "Record", ->
       repository.registerTable(Blog.table)
       Blog.transaction (err, { Blog }) ->
         TransactionBlog = Blog
-        Blog.create({ id: 5, title: 'In transaction' }, done)
+        Blog.create({ title: 'In transaction' }, done)
 
     it "starts a transaction, passing a set of record classes that use the transaction", (done) ->
       async.parallel([
         (f) ->
-          TransactionBlog.find 5, (err, blog) ->
+          TransactionBlog.find { title: 'In transaction' }, (err, blog) ->
             expect(blog.title()).toBe('In transaction')
             f()
         (f) ->
-          Blog.find 5, (err, blog) ->
+          Blog.find { title: 'In transaction' }, (err, blog) ->
             expect(blog).toBeUndefined()
             f()
       ], done)
@@ -57,14 +57,14 @@ describe "Record", ->
     describe ".commit", ->
       it "commits the transaction", (done) ->
         TransactionBlog.commit ->
-          Blog.find 5, (err, blog) ->
+          Blog.find { title: 'In transaction' }, (err, blog) ->
             expect(blog.title()).toBe('In transaction')
             done()
 
     describe ".rollBack", ->
       it "commits the transaction", (done) ->
         TransactionBlog.rollBack ->
-          Blog.find 5, (err, blog) ->
+          Blog.find { title: 'In transaction' }, (err, blog) ->
             expect(blog).toBeUndefined()
             done()
 
@@ -81,10 +81,9 @@ describe "Record", ->
     describe "when the record has not yet been saved", ->
       it "inserts a record", (done) ->
         blog = new Blog(public: false, title: 'New Blog', authorId: 2)
-        blog.save ->
+        blog.save (err) ->
           Blog.find { title: 'New Blog' }, (err, record) ->
             expect(record).toEqualRecord(Blog,
-              id: null,
               public: false,
               title: 'New Blog',
               authorId: 2
@@ -93,12 +92,12 @@ describe "Record", ->
 
     describe "when the record has already been saved", ->
       it "updates the record", (done) ->
-        Blog.find 1, (err, blog) ->
+        Blog.find { title: 'Public Blog1' }, (err, blog) ->
+          id = blog.id()
           blog.title('New Blog, version 2')
           blog.save ->
-            Blog.find 1, (err, updatedBlog) ->
+            Blog.find id, (err, updatedBlog) ->
               expect(updatedBlog).toEqualRecord(Blog,
-                id: 1,
                 public: true,
                 title: 'New Blog, version 2',
                 authorId: 1
@@ -116,9 +115,10 @@ describe "Record", ->
 
     describe "when the record has already been saved", ->
       it "deletes the record", (done) ->
-        Blog.find 1, (err, blog) ->
+        Blog.first (err, blog) ->
+          id = blog.id()
           blog.destroy ->
-            Blog.find 1, (err, blog) ->
+            Blog.find id, (err, blog) ->
               expect(blog).toBeUndefined()
               done()
 
