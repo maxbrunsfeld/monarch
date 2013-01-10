@@ -14,20 +14,10 @@ class Insert
     parenthesizedList(@columns)
 
   valuesClause: ->
-    lists = for valueList in @valueLists
-      sqlValueList = (@sqlize(value) for value in valueList)
-      parenthesizedList(sqlValueList)
-    lists.join(', ')
-
-  sqlize: (value) ->
-    value
+    (parenthesizedList(list) for list in @valueLists).join(', ')
 
 parenthesizedList = (elements) ->
-  parts = (element.toSql() for element in elements)
-  [
-    '(',
-    parts.join(', '),
-    ')'
-  ].join(' ')
+  listSql = (element.toSql() for element in elements).join(', ')
+  "( #{listSql} )"
 
 module.exports = Insert
