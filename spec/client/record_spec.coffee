@@ -724,4 +724,4 @@ describe "Monarch.Record", ->
     describe "#toString", ->
       it "displays the record's class and field values", ->
         blogPost = new BlogPost(blogId: 1, title: 'Alpha', body: 'Charlie')
-        expect(blogPost.toString()).toBe('<BlogPost id: null, blogId: 1, title: "Alpha", body: "Charlie">')
+        expect(blogPost.toString()).toBe('<BlogPost blogId: 1, title: "Alpha", body: "Charlie">')

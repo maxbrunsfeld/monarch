@@ -150,11 +150,12 @@ class Monarch.Record extends Monarch.Base
   fieldValues: (wireRepresentation, allFields) ->
     fieldValues = {}
     for name, field of @localFields
-      if wireRepresentation
+      value = if wireRepresentation
         if (allFields or field.isDirty()) and not (field instanceof Monarch.SyntheticField)
-          fieldValues[name] = field.wireRepresentation()
+          field.wireRepresentation()
       else
-        fieldValues[name] = field.getValue() ? null
+        field.getValue()
+      fieldValues[name] = value unless value is undefined
     fieldValues
 
   created: (attributes) ->
