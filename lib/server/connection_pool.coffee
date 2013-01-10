@@ -1,5 +1,6 @@
 _ = require "underscore"
 pg = require('pg').native
+Transaction = require "./transaction"
 
 REQUIRED_KEYS = ['host', 'port', 'user', 'database']
 OPTIONAL_KEYS = ['password']
@@ -30,25 +31,5 @@ configError = (pool) ->
   missingConfigOptions = _.filter REQUIRED_KEYS, (key) -> !pool._config[key]
   unless _.isEmpty(missingConfigOptions)
     new Error("Missing connection parameters: " + missingConfigOptions.join(', '))
-
-class Transaction
-  constructor: (@client) ->
-
-  query: (args...) ->
-    @client.query(args...)
-
-  rollBack: (callback) ->
-    queryAndClose(this, "ROLLBACK", callback)
-
-  commit: (callback) ->
-    queryAndClose(this, "COMMIT", callback)
-
-  end: ->
-    @client.end()
-
-queryAndClose = (transaction, sql, callback) ->
-  transaction.query sql, (err, result) ->
-    transaction.end()
-    callback(err, result)
 
 module.exports = ConnectionPool
