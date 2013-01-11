@@ -79,8 +79,12 @@ describe "Record", ->
 
   describe "#save", ->
     describe "when the record has not yet been saved", ->
-      it "inserts a record", (done) ->
+      blog = null
+
+      beforeEach ->
         blog = new Blog(public: false, title: 'New Blog', authorId: 2)
+
+      it "inserts a record", (done) ->
         blog.save (err) ->
           Blog.find { title: 'New Blog' }, (err, record) ->
             expect(record).toEqualRecord(Blog,
@@ -89,6 +93,11 @@ describe "Record", ->
               authorId: 2
             )
             done()
+
+      it "sets the record's id from the database", (done) ->
+        blog.save ->
+          expect(blog.id()).toBeGreaterThan(1)
+          done()
 
     describe "when the record has already been saved", ->
       it "updates the record", (done) ->
@@ -115,7 +124,7 @@ describe "Record", ->
 
     describe "when the record has already been saved", ->
       it "deletes the record", (done) ->
-        Blog.first (err, blog) ->
+        Blog.find { title: 'Public Blog1' }, (err, blog) ->
           id = blog.id()
           blog.destroy ->
             Blog.find id, (err, blog) ->

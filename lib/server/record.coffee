@@ -23,11 +23,14 @@ module.exports = (Record) ->
         this[methodName] = ->
           @table[methodName].apply(@table, arguments)
 
-    save: ->
+    save: (callback) ->
       if @isPersisted()
-        singletonRelation(this).updateAll(@fieldValues(), arguments...)
+        singletonRelation(this).updateAll(@fieldValues(), callback)
       else
-        @constructor.table.create(@fieldValues(), arguments...)
+        self = this
+        @constructor.table.create(@fieldValues(), (err, _, rows) ->
+          self.id(rows[0].id) unless err
+          callback.apply(this, arguments))
 
     destroy: ->
       if @isPersisted()
