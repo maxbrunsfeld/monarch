@@ -18,6 +18,7 @@ describe "InsertBuilder", ->
           ("public", "title", "author_id")
         VALUES
           (true, 'Blog1', 5)
+        RETURNING "id"
       """)
 
   describe "when passed multiple hashes of attributes", ->
@@ -32,6 +33,7 @@ describe "InsertBuilder", ->
         VALUES
           (true, 'Blog1', 11),
           (false, 'Blog2', 12)
+        RETURNING "id"
       """)
 
     it "fills in null values if attributes are missing from some hashes", ->
@@ -45,4 +47,5 @@ describe "InsertBuilder", ->
         VALUES
           (true, 'Blog1', NULL),
           (NULL, 'Blog2', 12)
+        RETURNING "id"
       """)

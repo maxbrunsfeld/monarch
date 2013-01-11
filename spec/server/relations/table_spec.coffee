@@ -1,16 +1,16 @@
 { Monarch, async, pg } = require "../spec_helper"
 
 describe "Relations.Table", ->
-  class Blog extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      authorId: 'integer'
-
-  blogs = Blog.table
+  [Blog, blogs] = []
 
   beforeEach (done) ->
+    class Blog extends Monarch.Record
+      @extended(this)
+      @columns
+        public: 'boolean'
+        title: 'string'
+        authorId: 'integer'
+    blogs = Blog.table
     blogs.deleteAll(done)
 
   describe "#create", ->
@@ -41,8 +41,15 @@ describe "Relations.Table", ->
             done()
 
       it "passes the number of records created", (done) ->
-        blogs.create hashes, (err, result) ->
-          expect(result).toBe(2)
+        blogs.create hashes, (err, count) ->
+          expect(count).toBe(2)
+          done()
+
+      it "passes the ids of the rows created", (done) ->
+        blogs.create hashes, (err, count, rows) ->
+          expect(rows.length).toBe(2)
+          expect(rows[0].id).toBeGreaterThan(0)
+          expect(rows[1].id).toBe(rows[0].id + 1)
           done()
 
   describe "#updateAll", ->

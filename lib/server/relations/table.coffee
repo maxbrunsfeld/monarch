@@ -19,4 +19,4 @@ buildSql = (relation, builderClass, args) ->
 executeAndGetRowCount = (table, sql, f) ->
   table.connection().query sql, (err, result) ->
     return f(err) if err
-    f(null, result.rowCount)
+    f(null, result.rowCount, result.rows)

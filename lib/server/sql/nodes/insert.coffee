@@ -5,16 +5,20 @@ class Insert
     [
       "INSERT INTO",
       @table.toSql(),
-      @columnsClause(),
+      @columnsClauseSql(),
       "VALUES",
-      @valuesClause()
+      @valuesClauseSql(),
+      @returningClauseSql()
     ].join(' ')
 
-  columnsClause: ->
+  columnsClauseSql: ->
     parenthesizedList(@columns)
 
-  valuesClause: ->
+  valuesClauseSql: ->
     (parenthesizedList(list) for list in @valueLists).join(', ')
+
+  returningClauseSql: ->
+    'RETURNING "id"'
 
 parenthesizedList = (elements) ->
   listSql = (element.toSql() for element in elements).join(', ')
