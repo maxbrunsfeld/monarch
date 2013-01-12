@@ -131,3 +131,27 @@ describe "Record", ->
               expect(blog).toBeUndefined()
               done()
 
+  describe "#reload", ->
+    record = null
+
+    beforeEach ->
+      record = new Blog(public: true, title: 'New Blog', authorId: 5)
+
+    describe "when the record is not persisted", ->
+      it "raises an error", ->
+        expect(->
+          record.reload ->
+        ).toThrow("Can't reload unpersisted record")
+
+    describe "when the record is persisted", ->
+      beforeEach (done) ->
+        record.save ->
+          Blog.where(id: record.id()).updateAll { title: 'Updated Blog' }, ->
+            done()
+
+      it "updates the record's fields from the database", (done) ->
+        expect(record.title()).toBe('New Blog')
+        record.reload ->
+          expect(record.title()).toBe('Updated Blog')
+          done()
+

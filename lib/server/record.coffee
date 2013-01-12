@@ -39,5 +39,11 @@ module.exports = (Record) ->
     isPersisted: ->
       @id()?
 
+    reload: (callback) ->
+      throw "Can't reload unpersisted record" unless @isPersisted()
+      singletonRelation(this).first (err, record) =>
+        @localUpdate(record.fieldValues())
+        callback()
+
 singletonRelation = (record) ->
   record.constructor.table.where(id: record.id())
