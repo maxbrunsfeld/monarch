@@ -1,1 +1,1 @@
-#= require ./lib/client_test_support/index
+#= require ./src/client_test_support/index

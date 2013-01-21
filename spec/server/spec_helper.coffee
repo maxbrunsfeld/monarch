@@ -81,7 +81,7 @@ normalizeSql = (string) ->
     .replace(/^\s/g, '')
 
 databaseConfig = require "./support/database"
-root = "#{__dirname}/../../lib/server"
+root = "#{__dirname}/../../src/server"
 Monarch = require "#{root}/index"
 
 module.exports =

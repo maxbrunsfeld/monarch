@@ -7,11 +7,11 @@ task "build", "compile source files", ->
 
   fs.writeFileSync(
     "monarch.js",
-    snockets.getConcatenation 'lib/client/index.coffee', async: false)
+    snockets.getConcatenation 'src/client/index.coffee', async: false)
 
   fs.writeFileSync(
     "monarch_test_support.js",
-    snockets.getConcatenation 'lib/client_test_support/index.coffee', async: false)
+    snockets.getConcatenation 'src/client_test_support/index.coffee', async: false)
 
 task "spec:client", "start server for client-side tests", ->
   require "#{__dirname}/script/server"
@@ -28,7 +28,7 @@ task "spec:server", "run server-side tests", (options) ->
     proc.stderr.pipe(process.stderr)
 
   watcher = require('watch-tree')
-  for path in ["spec/server", "lib/core", "lib/server"]
+  for path in ["spec/server", "src/core", "src/server"]
     watcher.watchTree("#{__dirname}/#{path}", 'sample-rate': 10)
       .on('fileModified', runTests)
       .on('fileCreated', runTests)
