@@ -1,4 +1,5 @@
 #= require ./init
+#= require ./monarch
 #= require ./util/deferrable
 #= require ./util/inflection
 #= require ./util/node

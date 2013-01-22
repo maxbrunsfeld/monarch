@@ -1,5 +1,5 @@
 _ = require "underscore"
-Monarch = require './core'
+Monarch = require("./core")
 { connection } = require('./default_repository')
 
 _.extend Monarch,

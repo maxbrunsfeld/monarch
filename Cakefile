@@ -1,17 +1,9 @@
 option '-p', '--path [DIR]', 'path to directory'
 
 task "build", "compile source files", ->
-  fs = require("fs")
-  Snockets = require 'snockets'
-  snockets = new Snockets
-
-  fs.writeFileSync(
-    "monarch.js",
-    snockets.getConcatenation 'src/client/index.coffee', async: false)
-
-  fs.writeFileSync(
-    "monarch_test_support.js",
-    snockets.getConcatenation 'src/client_test_support/index.coffee', async: false)
+  build = require("./script/build")
+  build("src/client/index.coffee", "lib/client.js")
+  build("src/client_test_support/index.coffee", "lib/client_test_support.js")
 
 task "spec:client", "start server for client-side tests", ->
   require "#{__dirname}/script/server"

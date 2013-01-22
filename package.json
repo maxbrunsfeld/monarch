@@ -2,7 +2,8 @@
   "name": "monarch-db",
   "version": "0.0.1",
   "description": "A relational modeling framework for client-centric web applications",
-  "main": "./lib/server/index",
+  "main": "./lib/server",
+  "browserify": "./lib/client",
   "repository": {
     "type": "git",
     "url": "git://github.com/maxbrunsfeld/monarch.git"
