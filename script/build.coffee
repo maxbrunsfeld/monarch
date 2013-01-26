@@ -1,6 +1,12 @@
 fs = require("fs")
-snockets = new (require("snockets"))
+{ parallel } = require("async")
+{ execFile } = require("child_process")
+Snockets = require("snockets")
 
-module.exports = (srcFile, destinationFile) ->
-  code = snockets.getConcatenation(srcFile, async: false)
-  fs.writeFileSync(destinationFile, code)
+module.exports = (sourceFile, destinationFile) ->
+  (new Snockets).scan sourceFile, (err, graph) ->
+    dependencies = graph.getChain(sourceFile)
+    args = ["-c", "--join", destinationFile]
+    execFile "coffee", args.concat(dependencies), (err) ->
+      message = err || "Wrote file #{destinationFile}"
+      console.log message
