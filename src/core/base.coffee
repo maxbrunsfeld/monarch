@@ -1,4 +1,6 @@
 class Monarch.Base
+  { capitalize } = Monarch.Util.Inflection
+
   @deriveEquality: (properties...) ->
     @prototype.isEqual = (other) ->
       return false unless other instanceof @constructor
@@ -10,8 +12,6 @@ class Monarch.Base
     for methodName in methodNames
       do (methodName) =>
         @prototype[methodName] = (args...) -> this[to][methodName](args...)
-
-  { capitalize } = Monarch.Util.Inflection
 
   @accessors: (methodNames...) ->
     for methodName in methodNames

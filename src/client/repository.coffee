@@ -1,6 +1,7 @@
-{ capitalize, convertKeysToCamelCase, camelize, singularize } = Monarch.Util.Inflection
+Monarch.Repository = do ->
 
-Monarch.Repository =
+  { capitalize, convertKeysToCamelCase, camelize, singularize } = Monarch.Util.Inflection
+
   tables: {}
   pauseCount: 0
 

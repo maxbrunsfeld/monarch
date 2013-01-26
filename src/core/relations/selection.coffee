@@ -17,10 +17,10 @@ class Monarch.Relations.Selection extends Monarch.Relations.Relation
     predicate: @predicate.wireRepresentation()
     operand: @operand.wireRepresentation()
 
-addSatisfyingAttributes = (predicate, hashes) ->
-  satisifyingAttributes = predicate.satisfyingAttributes()
-  if _.isArray(hashes)
-    for hash in hashes
-      _.extend({}, hash, satisifyingAttributes)
-  else
-    _.extend({}, hashes, satisifyingAttributes)
+  addSatisfyingAttributes = (predicate, hashes) ->
+    satisifyingAttributes = predicate.satisfyingAttributes()
+    if _.isArray(hashes)
+      for hash in hashes
+        _.extend({}, hash, satisifyingAttributes)
+    else
+      _.extend({}, hashes, satisifyingAttributes)

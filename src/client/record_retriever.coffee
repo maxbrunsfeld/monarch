@@ -1,4 +1,5 @@
-Monarch.RecordRetriever =
+Monarch.RecordRetriever = do ->
+
   retrieveRecords: Monarch.Util.Visitor.visit
 
   visit_Relations_Selection: (r) ->

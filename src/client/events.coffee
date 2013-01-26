@@ -1,4 +1,59 @@
-Monarch.Events =
+Monarch.Events = do ->
+  subscribeToOperand = (r, callbacks) ->
+    Monarch.Events.activate(r.operand)
+    setupEvents(r)
+    for event, callback of callbacks
+      subscribe(r, r.operand, event, callback)
+
+  subscribeToLeftAndRightOperands = (r, callbacksBySide) ->
+    Monarch.Events.activate(r.right)
+    Monarch.Events.activate(r.left)
+    setupEvents(r)
+    for side, callbacks of callbacksBySide
+      for event, callback of callbacks
+        subscribe(r, r[side], event, callback)
+
+  subscribeToBothOperands = (r, callbacks) ->
+    callbacksBySide = { left: {}, right: {} }
+    for side, sideCallbacks of callbacksBySide
+      for event, callback of callbacks
+        sideCallbacks[event] = _.bind(callback, this, side)
+    subscribeToLeftAndRightOperands(r, callbacksBySide)
+
+  subscribe = (r, operand, event, callback) ->
+    r.subscriptions.add(Monarch.Events[event](operand, callback))
+
+  deactivateIfNeeded = (r) ->
+    if (hasSubscriptions(r) and r.constructor isnt Monarch.Relations.Table)
+      r._insertNode = null
+      r._updateNode = null
+      r._removeNode = null
+      r.subscriptions.destroy()
+      r.isActive = false
+
+  setupEvents = (r) ->
+    r._insertNode = new Monarch.Util.Node()
+    r._updateNode = new Monarch.Util.Node()
+    r._removeNode = new Monarch.Util.Node()
+    r._insertNode.onEmpty -> deactivateIfNeeded(r)
+    r._updateNode.onEmpty -> deactivateIfNeeded(r)
+    r._removeNode.onEmpty -> deactivateIfNeeded(r)
+    r.subscriptions = new Monarch.Util.SubscriptionBundle()
+    r.isActive = true
+    r.contents()
+
+  clearEvents = (r) ->
+    r._insertNode.clear()
+    r._updateNode.clear()
+    r._removeNode.clear()
+
+  hasSubscriptions = (r) ->
+    return false unless r.isActive
+    (r._insertNode.size() + r._updateNode.size() + r._removeNode.size()) > 0
+
+  otherOperand = (r, side) ->
+    if side == 'left' then r.right else r.left
+
   onInsert: (relation, callback, context) ->
     Monarch.Events.activate(relation)
     relation._insertNode.subscribe(callback, context)
@@ -20,8 +75,6 @@ Monarch.Events =
     @visit(relation) unless relation.isActive
   clear: (relation) ->
     clearEvents(relation)
-
-  # private
 
   visit: Monarch.Util.Visitor.visit
 
@@ -171,58 +224,3 @@ Monarch.Events =
       onRemove: (side, tuple, index, newKey, oldKey) ->
         unless otherOperand(r, side).containsKey(newKey, oldKey)
           r.remove(tuple, newKey, oldKey)
-
-subscribeToOperand = (r, callbacks) ->
-  Monarch.Events.activate(r.operand)
-  setupEvents(r)
-  for event, callback of callbacks
-    subscribe(r, r.operand, event, callback)
-
-subscribeToLeftAndRightOperands = (r, callbacksBySide) ->
-  Monarch.Events.activate(r.right)
-  Monarch.Events.activate(r.left)
-  setupEvents(r)
-  for side, callbacks of callbacksBySide
-    for event, callback of callbacks
-      subscribe(r, r[side], event, callback)
-
-subscribeToBothOperands = (r, callbacks) ->
-  callbacksBySide = { left: {}, right: {} }
-  for side, sideCallbacks of callbacksBySide
-    for event, callback of callbacks
-      sideCallbacks[event] = _.bind(callback, this, side)
-  subscribeToLeftAndRightOperands(r, callbacksBySide)
-
-subscribe = (r, operand, event, callback) ->
-  r.subscriptions.add(Monarch.Events[event](operand, callback))
-
-deactivateIfNeeded = (r) ->
-  if (hasSubscriptions(r) and r.constructor isnt Monarch.Relations.Table)
-    r._insertNode = null
-    r._updateNode = null
-    r._removeNode = null
-    r.subscriptions.destroy()
-    r.isActive = false
-
-setupEvents = (r) ->
-  r._insertNode = new Monarch.Util.Node()
-  r._updateNode = new Monarch.Util.Node()
-  r._removeNode = new Monarch.Util.Node()
-  r._insertNode.onEmpty -> deactivateIfNeeded(r)
-  r._updateNode.onEmpty -> deactivateIfNeeded(r)
-  r._removeNode.onEmpty -> deactivateIfNeeded(r)
-  r.subscriptions = new Monarch.Util.SubscriptionBundle()
-  r.isActive = true
-  r.contents()
-
-clearEvents = (r) ->
-  r._insertNode.clear()
-  r._updateNode.clear()
-  r._removeNode.clear()
-
-hasSubscriptions = (r) ->
-  return false unless r.isActive
-  (r._insertNode.size() + r._updateNode.size() + r._removeNode.size()) > 0
-
-otherOperand = (r, side) ->
-  if side == 'left' then r.right else r.left

@@ -1,6 +1,6 @@
-{ convertKeysToSnakeCase, convertKeysToCamelCase } = Monarch.Util.Inflection
-
 class Monarch.Remote.MutateRequest extends Monarch.Util.Deferrable
+  { convertKeysToSnakeCase, convertKeysToCamelCase } = Monarch.Util.Inflection
+
   constructor: (@record, @fieldValues) ->
     super()
     Monarch.Repository.pauseUpdates()
