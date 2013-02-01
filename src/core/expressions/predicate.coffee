@@ -33,15 +33,3 @@ class Monarch.Expressions.Predicate extends Monarch.Base
 
   and: (otherPredicate) ->
     new Monarch.Expressions.And(this, otherPredicate)
-
-  wireRepresentation: ->
-    type: @wireRepresentationType,
-    leftOperand: @operandWireRepresentation(@left),
-    rightOperand: @operandWireRepresentation(@right)
-
-  operandWireRepresentation: (operand) ->
-    if operand and _.isFunction(operand.wireRepresentation)
-      operand.wireRepresentation()
-    else
-      type: 'Scalar',
-      value: operand

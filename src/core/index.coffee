@@ -17,4 +17,6 @@
 #= require_tree ./expressions
 #= require ./relations/relation
 #= require_tree ./relations
+#= require ./util/visitor
+#= require ./json
 #= require_tree .

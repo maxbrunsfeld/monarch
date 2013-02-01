@@ -83,3 +83,5 @@ class Monarch.Relations.Relation extends Monarch.Base
 
     new predicateClass(key, value).resolve(this)
 
+  wireRepresentation: ->
+    Monarch.Json.serialize(this)

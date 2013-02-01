@@ -1,6 +1,4 @@
 class Monarch.Expressions.And extends Monarch.Expressions.Predicate
-  wireRepresentationType: 'And'
-
   evaluate: (tuple) ->
     @left.evaluate(tuple) && @right.evaluate(tuple)
 

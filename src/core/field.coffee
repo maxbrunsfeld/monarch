@@ -16,7 +16,7 @@ class Monarch.Field
     @value
 
   wireRepresentation: ->
-    @column.valueWireRepresentation(@getValue())
+    Monarch.Json.serialize(this.getValue())
 
   signal: (transformer) ->
     new Monarch.Util.Signal(this, transformer)

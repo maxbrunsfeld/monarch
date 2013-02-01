@@ -12,11 +12,6 @@ class Monarch.Relations.Selection extends Monarch.Relations.Relation
   created: (attributes) ->
     @operand.created(addSatisfyingAttributes(@predicate, attributes))
 
-  wireRepresentation: ->
-    type: 'Selection'
-    predicate: @predicate.wireRepresentation()
-    operand: @operand.wireRepresentation()
-
   addSatisfyingAttributes = (predicate, hashes) ->
     satisifyingAttributes = predicate.satisfyingAttributes()
     if _.isArray(hashes)

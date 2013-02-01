@@ -1,6 +1,4 @@
 class Monarch.Expressions.Equal extends Monarch.Expressions.Predicate
-  wireRepresentationType: 'Equal'
-
   operator: (left, right) ->
     _.isEqual(left, right)
 

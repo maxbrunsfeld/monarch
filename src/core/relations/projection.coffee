@@ -30,8 +30,3 @@ class Monarch.Relations.Projection extends Monarch.Relations.Relation
 
   changesetInProjection: (changeset) ->
     _.values(changeset)[0].column.table.name == @table.name
-
-  wireRepresentation: ->
-    type: 'Projection'
-    operand: @operand.wireRepresentation()
-    table: @table.name

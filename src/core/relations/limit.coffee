@@ -4,9 +4,3 @@ class Monarch.Relations.Limit extends Monarch.Relations.Relation
 
   constructor: (@operand, @count) ->
     @orderByExpressions = operand.orderByExpressions
-
-  wireRepresentation: ->
-    type: 'Limit'
-    operand: @operand.wireRepresentation()
-    count: @count
-

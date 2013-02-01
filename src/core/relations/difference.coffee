@@ -4,8 +4,3 @@ class Monarch.Relations.Difference extends Monarch.Relations.Relation
 
   constructor: (@left, @right) ->
     @orderByExpressions = left.orderByExpressions
-
-  wireRepresentation: ->
-    type: 'Difference',
-    leftOperand: @left.wireRepresentation(),
-    rightOperand: @right.wireRepresentation()

@@ -61,9 +61,5 @@ class Monarch.Relations.Table extends Monarch.Relations.Relation
   resourceName: ->
     @recordClass.resourceName(@name)
 
-  wireRepresentation: ->
-    type: 'Table'
-    name: @resourceName()
-
   create: (args...) -> @recordClass.create(args...)
   created: (args...) -> @recordClass.created(args...)

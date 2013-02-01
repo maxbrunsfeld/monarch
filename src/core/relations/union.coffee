@@ -11,8 +11,3 @@ class Monarch.Relations.Union extends Monarch.Relations.Relation
     return if @lastUpdate == changeset
     @lastUpdate = changeset
     super(tuple, changeset, newKey, oldKey)
-
-  wireRepresentation: ->
-    type: 'Union'
-    leftOperand: @left.wireRepresentation()
-    rightOperand: @right.wireRepresentation()

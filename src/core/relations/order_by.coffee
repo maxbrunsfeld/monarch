@@ -1,7 +1,7 @@
 class Monarch.Relations.OrderBy extends Monarch.Relations.Relation
   @deriveEquality 'operand', 'orderByExpressions'
   @delegate 'getColumn', 'inferJoinColumns', 'columns',
-    'wireRepresentation', 'create', 'created', 'repository', to: 'operand'
+    'create', 'created', 'repository', to: 'operand'
 
   constructor: (@operand, orderByStrings) ->
     @orderByExpressions = @buildOrderByExpressions(orderByStrings)

@@ -31,9 +31,3 @@ class Monarch.Relations.InnerJoin extends Monarch.Relations.Relation
   buildKey: (tuple, oldKey) ->
     key = super(tuple)
     if oldKey then _.extend(key, oldKey) else key
-
-  wireRepresentation: ->
-    type: 'InnerJoin',
-    leftOperand: @left.wireRepresentation()
-    rightOperand: @right.wireRepresentation()
-    predicate: @predicate.wireRepresentation()
