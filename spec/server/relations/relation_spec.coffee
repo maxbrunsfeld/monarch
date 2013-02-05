@@ -52,6 +52,47 @@ describe "Relation", ->
       ], f),
     ], done)
 
+  describe ".fromJson", ->
+    tables = null
+    { Relation } = Monarch.Relations
+
+    beforeEach ->
+      tables = {
+        Blog: Blog.table,
+        BlogPost: BlogPost.table,
+        Comment: Comment.table
+      }
+
+    checkJsonParsing = (relation) ->
+      json = relation.wireRepresentation()
+      expect(Relation.fromJson(json, tables)).toEqual(relation)
+
+    it "works for tables", ->
+      checkJsonParsing Blog.table
+
+    it "works for selections", ->
+      checkJsonParsing Blog.table.where(public: true)
+
+    it "works for joins", ->
+      checkJsonParsing Blog.table.join(BlogPost.table)
+      checkJsonParsing Blog.table.join(BlogPost.table).join(Comment.table)
+
+    it "works for projections", ->
+      checkJsonParsing Blog.table.joinThrough(BlogPost.table)
+
+    it "works for limits and offsets", ->
+      checkJsonParsing Blog.table.limit(10)
+      checkJsonParsing Blog.table.offset(10)
+      checkJsonParsing Blog.table.limit(10, 2)
+
+    it "works for unions and differences", ->
+      checkJsonParsing Blog.where(authorId: 5).union(Blog.where(public: true))
+      checkJsonParsing Blog.where(authorId: 5).difference(Blog.where(public: true))
+
+    it "works when given record classes instead of tables", ->
+      tables = { Blog, BlogPost, Comment }
+      checkJsonParsing Blog.table
+
   describe "#all", ->
     describe "tables", ->
       it "builds the table's record class", (done) ->

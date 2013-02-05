@@ -1,4 +1,10 @@
 class Monarch.Relations.Relation extends Monarch.Base
+  @fromJson: (args...) ->
+    Monarch.Json.parse(args...)
+
+  wireRepresentation: ->
+    Monarch.Json.serialize(this)
+
   size: ->
     @all().length
 
@@ -82,6 +88,3 @@ class Monarch.Relations.Relation extends Monarch.Base
       predicateClass = Monarch.Expressions.Equal
 
     new predicateClass(key, value).resolve(this)
-
-  wireRepresentation: ->
-    Monarch.Json.serialize(this)
