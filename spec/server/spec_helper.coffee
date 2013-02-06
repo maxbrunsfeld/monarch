@@ -3,6 +3,7 @@ _ = require 'underscore'
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 500
 
 beforeEach ->
+  defaultRepository.clear()
   Monarch.configureConnection(databaseConfig)
   @addMatchers
     toBeA: (constructor) ->
@@ -83,6 +84,7 @@ normalizeSql = (string) ->
 databaseConfig = require "./support/database"
 root = "#{__dirname}/../../src/server"
 Monarch = require "#{root}/index"
+defaultRepository = require "#{root}/default_repository"
 
 module.exports =
   root: root

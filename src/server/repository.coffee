@@ -15,7 +15,7 @@ class Repository
     recordClasses
 
   clone: (connection) ->
-    newRepository = new Repository(connection)
+    newRepository = new Repository(connection || @connection)
     for tableName, table of this.tables
       newRepository.registerTable(cloneTable(table))
     newRepository
