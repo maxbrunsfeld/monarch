@@ -27,7 +27,8 @@ cloneTable = (table) ->
   newRecordClass = cloneClass(table.recordClass)
   newTable = new (table.constructor)(newRecordClass)
   newRecordClass.table = newTable
-  _.extend newTable, table, { recordClass: newRecordClass }
+  _.each table, (v, k) -> newTable[k] = v
+  _.extend newTable, { recordClass: newRecordClass }
 
 setRepository = (table, repository) ->
   table.recordClass.repository = -> repository
