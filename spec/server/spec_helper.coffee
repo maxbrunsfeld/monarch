@@ -91,5 +91,6 @@ module.exports =
   databaseConfig: databaseConfig
   Monarch: Monarch
   _: _
+  FakeResponse: require "./support/fake_response"
   async: require 'async'
   pg: require 'pg'

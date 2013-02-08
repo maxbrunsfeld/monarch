@@ -4,8 +4,9 @@ Monarch = require("./core")
 
 _.extend Monarch,
   resourceUrlSeparator: '_'
+  middleware: require "./middleware"
   Schema: require "./schema"
-  sessionMiddleware: require "./session_middleware"
+  Sandbox: require "./sandbox"
 
   configureConnection: (args...) ->
     connection.configure(args...)
