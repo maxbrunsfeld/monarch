@@ -1,6 +1,7 @@
 class Monarch.Relations.Table extends Monarch.Relations.Relation
   { capitalize, uncapitalize } = Monarch.Util.Inflection
 
+  @deriveEquality 'name', 'columnsByName'
   @delegate 'repository', to: 'recordClass'
 
   constructor: (@recordClass) ->
