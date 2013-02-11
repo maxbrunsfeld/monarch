@@ -9,10 +9,9 @@ module.exports = (Relation) ->
       (new SelectBuilder).buildQuery(this).toSql()
 
     all: (f) ->
-      self = this
-      @connection().query @readSql(), (err, result) ->
+      @connection().query @readSql(), (err, result) =>
         return f(err) if err
-        f(null, TupleBuilder.visit(self, result.rows))
+        f(null, TupleBuilder.visit(this, result.rows))
 
     at: (index, f) ->
       @offset(index).first(f)

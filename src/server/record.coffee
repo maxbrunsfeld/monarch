@@ -27,9 +27,8 @@ module.exports = (Record) ->
       if @isPersisted()
         singletonRelation(this).updateAll(@fieldValues(), callback)
       else
-        self = this
-        @constructor.table.create(@fieldValues(), (err, _, rows) ->
-          self.id(rows[0].id) unless err
+        @constructor.table.create(@fieldValues(), (err, _, rows) =>
+          this.id(rows[0].id) unless err
           callback.apply(this, arguments))
 
     destroy: ->
