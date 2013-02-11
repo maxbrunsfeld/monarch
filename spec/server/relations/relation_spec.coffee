@@ -1,30 +1,30 @@
 { Monarch, async, pg, _ } = require "../spec_helper"
 
 describe "Relation", ->
-  blogs = blogPosts = comments = null
-
-  class Blog extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      authorId: 'integer'
-
-  class BlogPost extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      blogId: 'integer'
-      title: 'string'
-
-  class Comment extends Monarch.Record
-    @extended(this)
-    @columns
-      body: 'string'
-      blogPostId: 'integer'
-      authorId: 'integer'
+  [Blog, BlogPost, Comment, blogs, blogPosts, comments] = []
 
   beforeEach (done) ->
+    class Blog extends Monarch.Record
+      @extended(this)
+      @columns
+        public: 'boolean'
+        title: 'string'
+        authorId: 'integer'
+
+    class BlogPost extends Monarch.Record
+      @extended(this)
+      @columns
+        public: 'boolean'
+        blogId: 'integer'
+        title: 'string'
+
+    class Comment extends Monarch.Record
+      @extended(this)
+      @columns
+        body: 'string'
+        blogPostId: 'integer'
+        authorId: 'integer'
+
     blogs = Blog.table
     blogPosts = BlogPost.table
     comments = Comment.table
@@ -92,6 +92,14 @@ describe "Relation", ->
     it "works when given record classes instead of tables", ->
       tables = { Blog, BlogPost, Comment }
       checkJsonParsing Blog.table
+
+  describe ".inRepository", ->
+    it "makes a clone of the relation that uses the given repository", ->
+      relation = Blog.where(public: true).join(BlogPost.where(public: false))
+      newRepository = relation.repository().clone()
+      newRelation = relation.inRepository(newRepository)
+      expect(newRelation.isEqual(relation)).toBeTruthy()
+      expect(newRelation.repository()).toBe(newRepository)
 
   describe "#all", ->
     describe "tables", ->

@@ -24,5 +24,10 @@ module.exports = (Relation) ->
       @limit(1).all (err, results) ->
         f(err, results?[0])
 
+    inRepository: (repository) ->
+      @constructor.fromJson(
+        @wireRepresentation(),
+        repository.tables)
+
     connection: ->
       @repository().connection
