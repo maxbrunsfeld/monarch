@@ -1,50 +1,28 @@
-{ Monarch, async, pg, _ } = require "../spec_helper"
+{ Monarch, async, _, recordClasses, fixtureData } = require "../spec_helper"
+{ Relation } = Monarch.Relations
+{ Blog, BlogPost, Comment } = recordClasses
+blogs = Blog.table
+blogPosts = BlogPost.table
+comments = Comment.table
 
 describe "Relation", ->
-  [Blog, BlogPost, Comment, blogs, blogPosts, comments] = []
-
   beforeEach (done) ->
-    class Blog extends Monarch.Record
-      @extended(this)
-      @columns
-        public: 'boolean'
-        title: 'string'
-        authorId: 'integer'
-
-    class BlogPost extends Monarch.Record
-      @extended(this)
-      @columns
-        public: 'boolean'
-        blogId: 'integer'
-        title: 'string'
-
-    class Comment extends Monarch.Record
-      @extended(this)
-      @columns
-        body: 'string'
-        blogPostId: 'integer'
-        authorId: 'integer'
-
-    blogs = Blog.table
-    blogPosts = BlogPost.table
-    comments = Comment.table
-
     async.series([
-      (f) -> blogs.deleteAll(f),
-      (f) -> blogPosts.deleteAll(f),
-      (f) -> comments.deleteAll(f),
-      (f) -> blogs.create([
+      (f) -> Blog.table.deleteAll(f),
+      (f) -> BlogPost.table.deleteAll(f),
+      (f) -> Comment.table.deleteAll(f),
+      (f) -> Blog.table.create([
         { id: 1, public: true, title: 'Public Blog1', authorId: 1 }
         { id: 2, public: true, title: 'Public Blog2', authorId: 1 }
         { id: 3, public: false, title: 'Private Blog1', authorId: 1 }
       ], f),
-      (f) -> blogPosts.create([
+      (f) -> BlogPost.table.create([
         { id: 1, public: true, title: 'Public Post1', blogId: 1 }
         { id: 2, public: true, title: 'Public Post2', blogId: 2 }
         { id: 3, public: false, title: 'Private Post1', blogId: 1 }
         { id: 4, public: false, title: 'Private Post2', blogId: 2 }
       ], f),
-      (f) -> comments.create([
+      (f) -> Comment.table.create([
         { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1 }
         { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1 }
         { id: 3, body: 'Comment3', blogPostId: 2, authorId: 1 }
@@ -54,7 +32,6 @@ describe "Relation", ->
 
   describe ".fromJson", ->
     tables = null
-    { Relation } = Monarch.Relations
 
     beforeEach ->
       tables = {

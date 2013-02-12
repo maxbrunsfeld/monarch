@@ -1,15 +1,8 @@
-{ Monarch } = require "../spec_helper"
+{ Monarch, recordClasses } = require "../spec_helper"
+{ Blog } = recordClasses
+blogs = Blog.table
 
 describe "InsertBuilder", ->
-  class Blog extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      authorId: 'integer'
-
-  blogs = Blog.table
-
   describe "when passed a single hash of attributes", ->
     it "creates an insert statement with a single list of values", ->
       sql = blogs.createSql({ public: true, title: 'Blog1', authorId: 5 })

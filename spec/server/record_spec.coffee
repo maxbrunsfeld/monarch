@@ -1,21 +1,11 @@
-{ Monarch, async, pg, root } = require "./spec_helper"
-defaultRepository = require "#{root}/default_repository"
+{ Monarch, async, root, recordClasses } = require "./spec_helper"
 Repository = require "#{root}/repository"
 Transaction = require "#{root}/transaction"
+defaultRepository = require "#{root}/default_repository"
+{ Blog } = recordClasses
 
 describe "Record", ->
-  Blog = null
-
   beforeEach (done) ->
-    defaultRepository.clear()
-
-    class Blog extends Monarch.Record
-      @extended(this)
-      @columns
-        public: 'boolean'
-        title: 'string'
-        authorId: 'integer'
-
     Blog.deleteAll ->
       Blog.create [
         { public: true, title: 'Public Blog1', authorId: 1 },

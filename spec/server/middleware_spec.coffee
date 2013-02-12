@@ -1,24 +1,14 @@
-{ root, Monarch, _, FakeResponse } = require "./spec_helper"
-{ Relations, Record } = Monarch
-{ Relation, Table } = Relations
+{ root, Monarch, _, FakeResponse, recordClasses } = require "./spec_helper"
 Sandbox = require "#{root}/sandbox"
 middleware = require "#{root}/middleware"
+{ Relations, Record } = Monarch
+{ Relation, Table } = Relations
+{ Blog, BlogPost } = recordClasses
 
 describe "middleware", ->
-  [req, res, route, Blog, BlogPost] = []
+  [req, res, route] = []
 
   beforeEach ->
-    class Blog extends Monarch.Record
-      @extended(this)
-      @columns
-        title: 'string'
-        public: 'boolean'
-    class BlogPost extends Monarch.Record
-      @extended(this)
-      @columns
-        title: 'string'
-        public: 'boolean'
-
     req = { method: 'GET', headers: {} }
     res = new FakeResponse
 

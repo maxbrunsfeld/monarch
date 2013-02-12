@@ -1,23 +1,10 @@
-{ Monarch, root, _ } = require "./spec_helper"
+{ Monarch, root, _, recordClasses } = require "./spec_helper"
 Repository = require "#{root}/repository"
 ConnectionPool = require "#{root}/connection_pool"
+{ Blog, BlogPost } = recordClasses
 
 describe "Repository", ->
   repository = null
-
-  class Blog extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      authorId: 'integer'
-
-  class BlogPost extends Monarch.Record
-    @extended(this)
-    @columns
-      public: 'boolean'
-      title: 'string'
-      blogId: 'integer'
 
   beforeEach ->
     repository = new Repository

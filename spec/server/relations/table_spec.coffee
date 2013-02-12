@@ -1,16 +1,9 @@
-{ Monarch, async, pg } = require "../spec_helper"
+{ Monarch, async, recordClasses } = require "../spec_helper"
+{ Blog } = recordClasses
+blogs = Blog.table
 
 describe "Relations.Table", ->
-  [Blog, blogs] = []
-
   beforeEach (done) ->
-    class Blog extends Monarch.Record
-      @extended(this)
-      @columns
-        public: 'boolean'
-        title: 'string'
-        authorId: 'integer'
-    blogs = Blog.table
     blogs.deleteAll(done)
 
   describe "#create", ->
