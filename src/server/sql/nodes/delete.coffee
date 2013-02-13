@@ -1,11 +1,9 @@
 _ = require "underscore"
-{ Base } = require "../../core"
+Query = require "./query"
 
-class Delete extends Base
+class Delete extends Query
   constructor: (table, assignments) ->
     @setTable(table)
-
-  @accessors 'table', 'condition'
 
   toSql: ->
     _.compact([

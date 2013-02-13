@@ -1,7 +1,7 @@
 _ = require "underscore"
-{ Base } = require "../../core"
+Query = require "./query"
 
-class Select extends Base
+class Select extends Query
   constructor: (table, columns) ->
     @setTable(table)
     @setColumns(columns)
@@ -18,8 +18,7 @@ class Select extends Base
       @offsetClauseSql()
     ]).join(' ')
 
-  @accessors 'table', 'columns', 'condition', 'orderExpressions',
-             'limit', 'offset'
+  @accessors 'columns', 'orderExpressions', 'limit', 'offset'
 
   selectClauseSql: ->
     parts = (column.toSelectClauseSql() for column in @columns())

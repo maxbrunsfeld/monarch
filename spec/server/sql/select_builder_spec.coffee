@@ -33,6 +33,21 @@ describe "SelectBuilder", ->
           AND "blog_posts"."blog_id" = 1
       """)
 
+    it "deals with nested selections", ->
+      relation = blogPosts.where(public: true).where(blogId: 1)
+      expect(relation.readSql()).toBeLikeQuery("""
+        SELECT
+          "blog_posts"."id" as blog_posts__id,
+          "blog_posts"."public" as blog_posts__public,
+          "blog_posts"."title" as blog_posts__title,
+          "blog_posts"."blog_id" as blog_posts__blog_id
+        FROM
+          "blog_posts"
+        WHERE
+          "blog_posts"."public" = true
+          AND "blog_posts"."blog_id" = 1
+      """)
+
     it "quotes string literals correctly", ->
       relation = blogPosts.where({ title: "Node Fibers and You" })
       expect(relation.readSql()).toBeLikeQuery("""

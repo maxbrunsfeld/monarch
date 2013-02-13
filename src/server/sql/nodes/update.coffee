@@ -1,12 +1,12 @@
 _ = require "underscore"
-{ Base } = require "../../core"
+Query = require "./query"
 
-class Update extends Base
+class Update extends Query
   constructor: (table, assignments) ->
     @setTable(table)
     @setAssignments(assignments)
 
-  @accessors 'table', 'assignments', 'condition'
+  @accessors 'assignments'
 
   toSql: ->
     _.compact([

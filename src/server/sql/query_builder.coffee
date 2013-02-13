@@ -16,7 +16,7 @@ class QueryBuilder
 
   visit_Relations_Selection: (r, args...) ->
     _.tap @visit(r.operand, args...), (query) =>
-      query.setCondition(@visit(r.predicate, query.table()))
+      query.addCondition(@visit(r.predicate, query.table()))
 
   visit_Expressions_And: (e, table) ->
     new Nodes.And(@visit(e.left, table), @visit(e.right, table))
