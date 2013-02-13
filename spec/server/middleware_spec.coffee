@@ -1,22 +1,22 @@
 { root, Monarch, _, FakeResponse, recordClasses } = require "./spec_helper"
 Sandbox = require "#{root}/sandbox"
 middleware = require "#{root}/middleware"
-{ Relations, Record } = Monarch
-{ Relation, Table } = Relations
-{ Blog, BlogPost } = recordClasses
+{ Blog } = recordClasses
 
 describe "middleware", ->
-  [req, res, route] = []
+  [req, res, next, route] = []
+
+  class TestSandbox extends Sandbox
 
   beforeEach ->
     req = { method: 'GET', headers: {} }
     res = new FakeResponse
+    next = jasmine.createSpy('next')
 
     route = middleware({
       sessionKey: 'db',
       sandboxUrl: '/sandbox'
-      sandbox: new Sandbox ({ Blog }) ->
-        { Blog: Blog.where(public: true) }
+      sandboxClass: TestSandbox
     })
 
   describe "when not making a request to the sandbox", ->
@@ -51,71 +51,63 @@ describe "middleware", ->
         done()
 
   describe "when making a request to the sandbox", ->
-    [records, err, next] = []
+    [err, result] = []
 
     beforeEach ->
-      _.extend req,
-        url: '/sandbox'
-        query: {
-          relations: JSON.stringify([
-            Blog.limit(5).wireRepresentation()
-          ])
-        }
+      [err, result] = [null, {}]
+      _.each ["fetch", "create", "update", "delete"], (methodName) ->
+        spyOn(TestSandbox.prototype, methodName).andCallFake ->
+          _.last(arguments).call(this, err, result)
 
-      next = jasmine.createSpy('next')
-      spyOn(Relation.prototype, "all").andCallFake((fn) -> fn(err, records))
-
-    describe "when fetching a single relation", ->
+    itStopsTheRequest = ->
       it "does not call the next layer in the middleware stack", ->
         route(req, res, next)
         expect(next).not.toHaveBeenCalled()
 
-      it "constructs the relation based on the given table definitions", ->
-        records = []
-        route(req, res)
-        query = Relation.prototype.all
-        expect(query.calls.length).toBe(1)
-        expect(query.calls[0].object.isEqual(
-          Blog.where(public: true).limit(5))
-        ).toBeTruthy()
-
-      describe "when the relation contains records", ->
-        beforeEach ->
-          records = [
-            new Blog(title: 'blog1')
-            new Blog(title: 'blog2')
-          ]
-
-        it "responds with the records as JSON", ->
-          route(req, res)
-          expect(JSON.parse(res.body)).toEqual({
-            blogs: [
-              { title: 'blog1' }
-              { title: 'blog2' }
-            ]
-          })
-
-      describe "when the relation contains no records", ->
+    itHandlesSuccess = ->
+      describe "when the operation succeeds", ->
         beforeEach ->
           err = null
-          records = []
+          result = { blogs: { 5: { title: "dude" } } }
 
-        it "responds with empty JSON", ->
-          route(req, res)
-          expect(JSON.parse(res.body)).toEqual({})
+        it "responds with the result", ->
+          route(req, res, next)
+          expect(res.statusCode).toBe(200)
+          expect(res.body).toBe(JSON.stringify(result))
 
-      describe "when an error occurs while fetching the relation", ->
+    itHandlesErrors = ->
+      describe "when an error occurs", ->
         beforeEach ->
-          err = { message: '' }
-          records = null
+          err = { code: 404, message: "Relation 'sandwiches' not found" }
+          result = null
 
         it "responds with an error", ->
-          route(req, res)
-          expect(res.statusCode).toBe(500)
+          route(req, res, next)
+          expect(res.statusCode).toBe(404)
+          expect(res.body).toBe("Relation 'sandwiches' not found")
+
+    describe "when fetching relations", ->
+      beforeEach ->
+        _.extend req,
+          url: '/sandbox'
+          query: {
+            relations: JSON.stringify([
+              Blog.limit(5).wireRepresentation()
+            ])
+          }
+
+      it "fetches the relations using the sandbox", ->
+        route(req, res, next)
+        expect(TestSandbox::fetch).toHaveBeenCalled()
+        expect(TestSandbox::fetch.calls[0].args[0]).toEqual([
+          Blog.limit(5).wireRepresentation()
+        ])
+
+      itStopsTheRequest()
+      itHandlesSuccess()
+      itHandlesErrors()
 
     describe "when creating a record", ->
-      [err, results] = []
-
       beforeEach ->
         _.extend req,
           method: 'POST'
@@ -127,29 +119,58 @@ describe "middleware", ->
             }
           }
 
-        err = null
-        results = [{}]
-        spyOn(Table.prototype, "create").andCallFake((json, fn) ->
-          fn(err, null, results))
-
-      it "creates the record", ->
+      it "creates the record using the sandbox", ->
         route(req, res, next)
-        create = Table.prototype.create
-        expect(create.calls.length).toBe(1)
-        expect(create.calls[0].object.isEqual(BlogPost.table)).toBeTruthy()
-        expect(create.calls[0].args[0]).toEqual({
+        expect(TestSandbox::create).toHaveBeenCalled()
+        expect(TestSandbox::create.calls[0].args[0]).toBe('blog_posts')
+        expect(TestSandbox::create.calls[0].args[1]).toEqual({
           title: 'New Post'
           public: true
         })
 
-      describe "when the table does not exist", ->
-        it "responds with a 'not found'", ->
-          req.url = '/sandbox/non_existent_things'
-          route(req, res, next)
-          expect(res.statusCode).toBe(404)
+      itStopsTheRequest()
+      itHandlesSuccess()
+      itHandlesErrors()
 
-      describe "when the record is created successfully", ->
-        it "responds with the record's final attributes", ->
-          results = [{ title: 'New Post', public: true, id: 57 }]
-          route(req, res, next)
-          expect(JSON.parse(res.body)).toEqual(results[0])
+    describe "when deleting a record", ->
+      beforeEach ->
+        _.extend req,
+          method: 'DELETE'
+          url: '/sandbox/blog_posts/17'
+
+      it "deletes the record using the sandbox", ->
+        route(req, res, next)
+        expect(TestSandbox::delete).toHaveBeenCalled()
+        expect(TestSandbox::delete.calls[0].args[0]).toBe('blog_posts')
+        expect(TestSandbox::delete.calls[0].args[1]).toBe(17)
+
+      itStopsTheRequest()
+      itHandlesSuccess()
+      itHandlesErrors()
+
+    describe "when updating a record", ->
+      beforeEach ->
+        _.extend req,
+          method: 'PUT'
+          url: '/sandbox/blog_posts/17'
+          body: {
+            fieldValues: {
+              title: 'New Post'
+              public: true
+            }
+          }
+
+      it "updates the record using the sandbox", ->
+        route(req, res, next)
+        expect(TestSandbox::update).toHaveBeenCalled()
+        expect(TestSandbox::update.calls[0].args[0]).toBe('blog_posts')
+        expect(TestSandbox::update.calls[0].args[1]).toBe(17)
+        expect(TestSandbox::update.calls[0].args[2]).toEqual({
+          title: 'New Post'
+          public: true
+        })
+
+      itStopsTheRequest()
+      itHandlesSuccess()
+      itHandlesErrors()
+

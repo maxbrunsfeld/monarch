@@ -1,28 +1,93 @@
 _ = require "underscore"
-{ Json } = require("./core")
+async = require "async"
+{ Json, CompositeTuple } = require("./core")
 
 class Sandbox
-  constructor: (@exposeTables) ->
+  constructor: (@recordClasses) ->
 
-  fetch: (relationsJson, tables, fn) ->
-    tables = @exposeTables(tables)
+  @expose = (name, f) ->
+    definition = -> f.call(this, @recordClasses)
+    this::_tableDefinitions ?= {}
+    this::_tableDefinitions[name] = definition
+    this::[name] = definition
+
+  fetch: (relationsJson, fn) ->
     relations = for relationJson in relationsJson
-      Json.parse(relationJson, tables)
+      Json.parse(relationJson, exposedTables(this))
+    async.map relations, ((relation, f) -> relation.all(f)), (err, recordLists) ->
+      fn(err, buildDataset(recordLists) unless err)
 
-    relations[0].all (err, records) ->
-      return fn(err, null) if err
-      json = {}
-      unless _.isEmpty(records)
-        klass = records[0].constructor
-        name = Json.tableNameToJson(klass.name)
-        json[name] = (record.wireRepresentation() for record in records)
-      fn(null, json)
+  create: (name, fieldValues, fn) ->
+    beginTransactionWithTable this, name, (table, exposedTable) ->
+      return fn(tableNotFound(name)) unless table
+      table.create fieldValues, (err, count, rows) ->
+        exposedTable.find rows[0].id, (err, record) ->
+          if record
+            table.commit -> fn(err, record.wireRepresentation())
+          else
+            table.rollBack -> fn(recordNotFound())
 
-  create: (tableName, recordJson, tables, fn) ->
-    table = tables[Json.tableNameFromJson(tableName)]
-    return fn('No such table') unless table
-    table.create recordJson, (err, count, rows) ->
-      return fn(err) if err
-      fn(null, rows[0])
+  update: (name, id, fieldValues, fn) ->
+    beginTransactionWithTable this, name, (table, exposedTable) ->
+      return fn(tableNotFound(name)) unless table
+      exposedTable.find id, (err, record) ->
+        return fn(recordNotFound()) unless record
+        record.update fieldValues, (err) ->
+          exposedTable.find id, (err, record) ->
+            if record
+              table.commit -> fn(err, record.wireRepresentation())
+            else
+              table.rollBack -> fn(recordNotFound())
+
+  delete: (name, id, fn) ->
+    [tableName, exposedTable] = getExposedTable(this, name)
+    return fn(tableNotFound(name)) unless exposedTable
+    exposedTable.find id, (err, record) ->
+      if record
+        record.destroy(fn)
+      else
+        fn(recordNotFound())
+
+  beginTransactionWithTable = (sandbox, name, fn) ->
+    [tableName, exposedTable] = getExposedTable(sandbox, name)
+    return fn() unless exposedTable
+    exposedTable.transaction (err, tx) ->
+      txTable = tx[tableName]
+      txExposedTable = exposedTable.inRepository(txTable.repository())
+      fn(txTable, txExposedTable)
+
+  getExposedTable = (sandbox, name) ->
+    tableName = Json.tableNameFromJson(name)
+    [tableName, exposedTables(sandbox)[tableName]]
+
+  exposedTables = (sandbox) ->
+    tables = {}
+    for name, definition of sandbox._tableDefinitions
+      tableName = Json.tableNameFromJson(name)
+      tables[tableName] = definition.call(sandbox)
+    tables
+
+  buildDataset = (recordLists) ->
+    dataset = {}
+    addTuplesToDataset(dataset, list) for list in recordLists
+    dataset
+
+  addTuplesToDataset = (dataset, tuples) ->
+    return if _.isEmpty(tuples)
+    klass = tuples[0].constructor
+    if (klass is CompositeTuple)
+      addTuplesToDataset(dataset, (tuple.left for tuple in tuples))
+      addTuplesToDataset(dataset, (tuple.right for tuple in tuples))
+    else
+      tableName = Json.tableNameToJson(klass.name)
+      hash = dataset[tableName] ?= {}
+      for tuple in tuples
+        hash[tuple.id()] = tuple.wireRepresentation()
+
+  tableNotFound = (name) ->
+    { code: 404, message: "Relation '#{name}' not found" }
+
+  recordNotFound = ->
+    { code: 404, message: "Record not found" }
 
 module.exports = Sandbox

@@ -128,9 +128,9 @@ class Monarch.Record extends Monarch.Base
   getRemoteField: (name) ->
     @remoteFields[name]
 
-  update: (attributes) ->
+  update: (attributes, args...) ->
     @localUpdate(attributes)
-    @save()
+    @save(args...)
 
   localUpdate: (attributes) ->
     for name, value of attributes
