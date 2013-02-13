@@ -11,4 +11,4 @@ class Monarch.CompositeTuple
     @left.getRecord(tableName) or @right.getRecord(tableName)
 
   toString: ->
-    "<" + @constructor.displayName + " left:" + @left.toString() + " right:" + @right.toString() + ">"
+    "<CompositeTuple left: #{@left.toString()}, right: #{@right.toString()}>"
