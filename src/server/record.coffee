@@ -6,19 +6,13 @@ module.exports = (Record) ->
     @repository = ->
       defaultRepository
 
-    @transaction = (callback) ->
-      repository = @repository()
-      repository.connection.begin (err, tx) ->
-        classes = repository.clone(tx).recordClasses() unless err
-        callback(err, classes)
-
     @commit = (callback) ->
       @repository().connection.commit(callback)
 
     @rollBack = (callback) ->
       @repository().connection.rollBack(callback)
 
-    for methodName in ['deleteAll', 'create']
+    for methodName in ['deleteAll', 'create', 'transaction']
       do (methodName) =>
         this[methodName] = ->
           @table[methodName].apply(@table, arguments)

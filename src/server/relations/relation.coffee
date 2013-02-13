@@ -5,6 +5,12 @@ TupleBuilder = require "../tuple_builder"
 module.exports = (Relation) ->
 
   Relation.reopen ->
+    transaction: (callback) ->
+      repository = @repository()
+      repository.connection.begin (err, tx) ->
+        classes = repository.clone(tx).recordClasses() unless err
+        callback(err, classes)
+
     readSql: ->
       (new SelectBuilder).buildQuery(this).toSql()
 
