@@ -31,3 +31,6 @@ if watch
       .on('fileModified', runTests)
       .on('fileCreated', runTests)
       .on('fileDeleted', runTests)
+else
+  proc.on('exit', (code) ->
+    process.exit(code))
