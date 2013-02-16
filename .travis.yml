@@ -1,3 +1,8 @@
+language: node_js
+
+node_js:
+  - 0.8
+
 env:
   - MONARCH_TEST_ENV=travis
 
