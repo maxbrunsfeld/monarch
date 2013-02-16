@@ -7,7 +7,7 @@ defaultRepository = require "#{root}/default_repository"
 
 matchers = require './support/matchers'
 recordClasses = require "./support/record_classes"
-databaseConfig = require "./support/database"
+databaseConfig = require "./support/db/dev"
 FakeResponse = require "./support/fake_response"
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 500
