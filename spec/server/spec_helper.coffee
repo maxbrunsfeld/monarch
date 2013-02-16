@@ -1,3 +1,5 @@
+env = process.env.MONARCH_TEST_ENV || 'dev'
+
 _ = require 'underscore'
 async = require 'async'
 
@@ -7,7 +9,7 @@ defaultRepository = require "#{root}/default_repository"
 
 matchers = require './support/matchers'
 recordClasses = require "./support/record_classes"
-databaseConfig = require "./support/db/dev"
+databaseConfig = require "./support/db/#{env}"
 FakeResponse = require "./support/fake_response"
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 500

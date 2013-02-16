@@ -1,0 +1,8 @@
+env:
+  - MONARCH_TEST_ENV=travis
+
+before_script:
+  - ./script/db/create.coffee
+  - ./script/db/setup.coffee
+
+script: ./script/spec/server.coffee
