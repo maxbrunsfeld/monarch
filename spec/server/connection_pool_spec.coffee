@@ -17,11 +17,11 @@ describe "ConnectionPool", ->
     describe "when connecting to the database fails", ->
       beforeEach ->
         connectionPool.configure(
-          _.extend({}, databaseConfig, host: 'totally-wrong'))
+          _.extend({}, databaseConfig, user: 'totally-wrong'))
 
       it "calls the callback with a connection error", (done) ->
         connectionPool.query 'select 1', (err, result) ->
-          expect(err.message).toMatch(/getaddrinfo/)
+          expect(err.message).toMatch(/role.*does not exist/)
           done()
 
     describe "when connecting to the database succeeds", ->
@@ -57,12 +57,12 @@ describe "ConnectionPool", ->
     describe "when there is a connection error", ->
       beforeEach ->
         connectionPool.configure(
-          _.extend({}, databaseConfig, host: 'totally-wrong'))
+          _.extend({}, databaseConfig, user: 'totally-wrong'))
 
       it "calls the callback the error", (done) ->
         connectionPool.begin (err, transaction) ->
           expect(transaction).toBeUndefined()
-          expect(err.message).toMatch(/getaddrinfo/)
+          expect(err.message).toMatch(/role.*does not exist/)
           done()
 
     describe "Transaction#query", ->
