@@ -19,9 +19,9 @@ files = [
   "update"
 ]
 
-{ camelize, capitalize } = require("../core").Util.Inflection
+{ camelize, capitalize } = require("../../core").Util.Inflection
 for file in files
-  klass = require "./nodes/#{file}"
+  klass = require "./#{file}"
   klassName = capitalize(camelize(file))
   module.exports[klassName] = klass
 
