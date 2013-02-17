@@ -2,6 +2,7 @@
 #= require ./monarch
 #= require ./util/inflection
 #= require ./util/visitor
+#= require ./util/deferrable
 #= require ./base
 #= require ./field
 #= require ./synthetic_field
