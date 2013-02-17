@@ -1,5 +1,7 @@
 # Monarch
 
+[![Build Status](https://travis-ci.org/maxbrunsfeld/monarch.png)](https://travis-ci.org/maxbrunsfeld/monarch)
+
 Monarch is a relational modeling framework for client-centric web applications.
 It's superficially similar to Backbone.js, but it uses the relational algebra as
 a declarative, compositional language for querying data and subscribing to
