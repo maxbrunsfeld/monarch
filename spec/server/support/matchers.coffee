@@ -3,20 +3,33 @@ _ = require "underscore"
 _.extend exports,
   toBeA: (constructor) ->
     @message = -> [
-      "Expected #{@actual} to be an instance of #{constructor.name}",
-      "Expected #{@actual} not to be an instance of #{constructor.name}"
+      "Expected #{@actual} to be an instance of #{constructor.name}."
+      "Expected #{@actual} not to be an instance of #{constructor.name}."
     ]
     @actual instanceof constructor
 
-  toBeLikeQuery: (sql) ->
-    normalizedActual = normalizeSql(@actual)
-    normalizedExpected = normalizeSql(sql)
+  toBeLikeQuery: (expectedSql, expectedLiterals=[]) ->
+    unless @actual?.length >= 2
+      @message = -> "Expected an array of [sql, literals], got #{@actual}"
+      return false
+    [actualSql, actualLiterals] = @actual
+    actualSql = normalizeSql(actualSql)
+    expectedSql = normalizeSql(expectedSql)
 
     @message = -> [
-      "\nExpected this query:\n\n  #{normalizedActual} \n\nto be like this query:\n\n  #{normalizedExpected}\n",
-      "\nExpected two different queries. Both were like this:\n\n  #{normalizedActual}\n",
+      """
+        Expected this query:
+        '#{expectedSql}', [#{expectedLiterals}]
+
+        but got this query:
+        '#{actualSql}', [#{actualLiterals}]
+      """,
+      """
+        Expected two different queries. Both were like this:
+        '#{actualSql}', [#{actualLiterals}]
+      """,
     ]
-    normalizedActual == normalizedExpected
+    _.isEqual([actualSql, actualLiterals], [expectedSql, expectedLiterals])
 
   toEqualRecords: (recordClass, attrHashes) ->
     if message = recordArrayMatcherMessage(@actual, attrHashes.length)
@@ -55,13 +68,22 @@ recordArrayMatcherMessage = (records, n) ->
   unless records
     return "Expected an array of records. Got #{records}."
   unless (records.length == n)
-    return "\nExpected this:\n\n#{records}\n\nto contain #{n} tuples, not #{records.length}.\n"
+    return """
+      Expected this: #{records}
+      to contain #{n} tuples, not #{records.length}.
+    """
 
 recordMatcherMessage = (record, recordClass, attrs) ->
   unless record instanceof recordClass
-    return "\nExpected this record:  #{record}\nto be an instance of #{recordClass.name}.\n"
+    return """
+      Expected an instance of #{recordClass.name},
+      but got this: #{record}.
+    """
   unless isHashSubset(attrs, record.fieldValues())
-    return "\nExpected this record:  #{record}\nto have these attributes:  #{JSON.stringify(attrs)}\n"
+    return """
+      Expected this record: #{record}
+      to have these attributes: #{JSON.stringify(attrs)}
+    """
 
 isHashSubset = (subhash, hash) ->
   for key, value of subhash

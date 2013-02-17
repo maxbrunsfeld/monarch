@@ -1,4 +1,5 @@
 _ = require "underscore"
+SqlGenerator = require "../sql/generator"
 SelectBuilder = require "../sql/select_builder"
 TupleBuilder = require "../tuple_builder"
 
@@ -12,10 +13,12 @@ module.exports = (Relation) ->
         callback(err, classes)
 
     readSql: ->
-      (new SelectBuilder).buildQuery(this).toSql()
+      query = (new SelectBuilder).buildQuery(this)
+      (new SqlGenerator).toSql(query)
 
     all: (f) ->
-      @connection().query @readSql(), (err, result) =>
+      [string, literals] = @readSql()
+      @connection().query string, literals, (err, result) =>
         return f(err) if err
         f(null, TupleBuilder.visit(this, result.rows))
 

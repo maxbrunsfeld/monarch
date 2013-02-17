@@ -8,38 +8,7 @@ class Select extends Query
     @setCondition(null)
     @setOrderExpressions([])
 
-  toSql: ->
-    _.compact([
-      @selectClauseSql(),
-      @fromClauseSql(),
-      @whereClauseSql(),
-      @orderByClauseSql(),
-      @limitClauseSql(),
-      @offsetClauseSql()
-    ]).join(' ')
-
   @accessors 'columns', 'orderExpressions', 'limit', 'offset'
-
-  selectClauseSql: ->
-    parts = (column.toSelectClauseSql() for column in @columns())
-    "SELECT " + parts.join(', ')
-
-  fromClauseSql: ->
-    "FROM " + @table().toSql()
-
-  whereClauseSql: ->
-    "WHERE " + @condition().toSql() if @condition()
-
-  orderByClauseSql: ->
-    unless _.isEmpty(@orderExpressions())
-      parts = (e.toSql() for e in @orderExpressions())
-      "ORDER BY " + parts.join(', ')
-
-  limitClauseSql: ->
-    "LIMIT " + @limit() if @limit()
-
-  offsetClauseSql: ->
-    "OFFSET " + @offset() if @offset()
 
   canHaveJoinAdded: ->
     !(@condition()? || @limit()?)

@@ -9,17 +9,12 @@ class Subquery
     if innerNames
       {
         tableName: @name,
-        columnName: Column.aliasName(
-          innerNames.tableName,
-          innerNames.columnName),
-        needsAlias: false,
+        columnName: innerNames.columnName,
+        innerTableName: innerNames.tableName
       }
 
   allColumns: ->
     for column in @query.columns()
       new Column(this, column.tableName, column.name)
-
-  toSql: ->
-    "( #{@query.toSql()} ) as \"#{@name}\""
 
 module.exports = Subquery

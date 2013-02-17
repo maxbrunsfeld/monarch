@@ -9,9 +9,9 @@ describe "UpdateBuilder", ->
       expect(sql).toBeLikeQuery("""
         UPDATE "blogs"
         SET
-          "public" = false,
-          "title" = 'Updated Blog'
-      """)
+          "public" = $1,
+          "title" = $2
+      """, [false, "Updated Blog"])
 
   describe "selections", ->
     it "constructs an update statement with a condition", ->
@@ -22,8 +22,8 @@ describe "UpdateBuilder", ->
       expect(sql).toBeLikeQuery("""
         UPDATE "blogs"
         SET
-          "public" = false,
-          "title" = 'Updated Blog'
+          "public" = $1,
+          "title" = $2
         WHERE
-          "blogs"."author_id" = 5
-      """)
+          "blogs"."author_id" = $3
+      """, [false, "Updated Blog", 5])

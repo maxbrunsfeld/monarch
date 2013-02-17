@@ -14,11 +14,11 @@ class ConnectionPool
     for key, value of params
       @_config[key] = params[key] if _.include(REQUIRED_KEYS, key)
 
-  query: (sql, callback) ->
+  query: (args..., callback) ->
     return callback(error) if error = configError(this)
     pg.connect @_config, (err, client) ->
       return callback(err) if err
-      client.query(sql, callback)
+      client.query(args..., callback)
 
   begin: (callback) ->
     client = new pg.Client(@_config)

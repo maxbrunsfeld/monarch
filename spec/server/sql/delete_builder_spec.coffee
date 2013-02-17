@@ -17,6 +17,6 @@ describe "DeleteBuilder", ->
         DELETE FROM
           "blogs"
         WHERE
-          "blogs"."author_id" = 5
-      """)
+          "blogs"."author_id" = $1
+      """, [5])
 

@@ -2,17 +2,17 @@ _ = require "underscore"
 Nodes = require "./nodes"
 Visitor = require("../core").Util.Visitor
 
-visitPrimitive = (nodeClass) ->
-  (value) -> new nodeClass(value)
+visitPrimitive = (value) ->
+  new Nodes.Literal(value)
 
 class QueryBuilder
   buildQuery: Visitor.visit
   visit: Visitor.visit
 
-  visit_Boolean: visitPrimitive(Nodes.Literal)
-  visit_Number: visitPrimitive(Nodes.Literal)
-  visit_String: visitPrimitive(Nodes.StringLiteral)
-  visit_null: visitPrimitive(Nodes.Null)
+  visit_Boolean: visitPrimitive
+  visit_Number: visitPrimitive
+  visit_String: visitPrimitive
+  visit_null: visitPrimitive
 
   visit_Relations_Selection: (r, args...) ->
     _.tap @visit(r.operand, args...), (query) =>

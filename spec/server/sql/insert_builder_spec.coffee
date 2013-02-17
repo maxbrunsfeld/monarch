@@ -10,9 +10,9 @@ describe "InsertBuilder", ->
         INSERT INTO "blogs"
           ("public", "title", "author_id")
         VALUES
-          (true, 'Blog1', 5)
+          ($1, $2, $3)
         RETURNING "id"
-      """)
+      """, [true, "Blog1", 5])
 
   describe "when passed multiple hashes of attributes", ->
     it "creates an insert statement with a single list of values", ->
@@ -24,10 +24,10 @@ describe "InsertBuilder", ->
         INSERT INTO "blogs"
           ("public", "title", "author_id")
         VALUES
-          (true, 'Blog1', 11),
-          (false, 'Blog2', 12)
+          ($1, $2, $3),
+          ($4, $5, $6)
         RETURNING "id"
-      """)
+      """, [true, "Blog1", 11, false, "Blog2", 12])
 
     it "fills in null values if attributes are missing from some hashes", ->
       sql = blogs.createSql([
@@ -38,7 +38,7 @@ describe "InsertBuilder", ->
         INSERT INTO "blogs"
           ("public", "title", "author_id")
         VALUES
-          (true, 'Blog1', NULL),
-          (NULL, 'Blog2', 12)
+          ($1, $2, $3),
+          ($4, $5, $6)
         RETURNING "id"
-      """)
+      """, [true, "Blog1", null, null, "Blog2", 12])
