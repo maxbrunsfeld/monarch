@@ -1,7 +1,7 @@
 {
   "name": "monarch-db",
-  "version": "0.0.1",
-  "description": "A relational modeling framework for client-centric web applications",
+  "version": "0.0.2",
+  "description": "A relational modeling library for the browser and node",
   "main": "./lib/server",
   "browserify": "./lib/client",
   "repository": {
