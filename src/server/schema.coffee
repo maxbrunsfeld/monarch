@@ -1,14 +1,17 @@
-CreateTableStatement = require "./sql/nodes/create_table_statement"
+Generator = require "./sql/generator"
+{ CreateTable, DropTable } = require "./sql/nodes"
 { connection } = require "./default_repository"
 
 module.exports =
   dropTable: (tableName, done) ->
-    sql = "DROP TABLE IF EXISTS #{tableName};"
+    statement = new DropTable(tableName)
+    sql = (new Generator).toSql(statement)[0]
     @connection().query(sql, done)
 
   createTable: (tableName, columnDefinitions, done) ->
-    statement = new CreateTableStatement(tableName, columnDefinitions)
-    @connection().query(statement.toSql(), done)
+    statement = new CreateTable(tableName, columnDefinitions)
+    sql = (new Generator).toSql(statement)[0]
+    @connection().query(sql, done)
 
   connection: ->
     connection

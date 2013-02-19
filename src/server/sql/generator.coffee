@@ -1,6 +1,8 @@
 _ = require "underscore"
 Nodes = require "./nodes"
-{ visit } = require("../core").Util
+Types = require "./types"
+{ visit, Inflection } = require("../core").Util
+{ underscore } = Inflection
 
 class Generator
   toSql: (query) ->
@@ -88,6 +90,12 @@ class Generator
   visit_Nodes_Union: (node) -> @visit_Nodes_Binary(node, 'UNION')
   visit_Nodes_Difference: (node) -> @visit_Nodes_Binary(node, 'EXCEPT')
 
+  visit_Nodes_DropTable: (node) ->
+    "DROP TABLE IF EXISTS #{node.tableName};"
+
+  visit_Nodes_CreateTable: (node) ->
+    "#{@createTableClauseSql(node)} ( #{@columnTypesClauseSql(node)} );"
+
   visit_Nodes_Literal: (node) ->
     @addLiteral(node.value)
 
@@ -128,11 +136,22 @@ class Generator
   deleteClauseSql: (node) ->
     "DELETE FROM " + @visit(node.table())
 
+  createTableClauseSql: (node) ->
+    "CREATE TABLE " + node.tableName
+
+  columnTypesClauseSql: (node) ->
+    expressions = for name, type of node.columnDefinitions
+      "#{underscore(name)} #{@databaseType(type)}"
+    expressions.join(', ')
+
   qualifyColumnName: (tableName, columnName) ->
     "#{@quoteIdentifier(tableName)}.#{@quoteIdentifier(columnName)}"
 
   aliasColumnName: (tableName, columnName) ->
     "#{tableName}__#{columnName}"
+
+  databaseType: (type) ->
+    Types[type] || throw new Error("Unknown column type '#{type}'")
 
   parenthesizeIfNeeded: (node) ->
     if @needsParens(node)
