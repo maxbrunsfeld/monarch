@@ -49,7 +49,7 @@ class Generator
     "( #{@visit(node.query)} ) as #{@quoteIdentifier(node.name)}"
 
   visit_Nodes_Table: (node) ->
-    @quoteIdentifier(node.tableName)
+    @quoteIdentifier(node.name)
 
   visit_Nodes_Join: (node) ->
     [
@@ -61,16 +61,18 @@ class Generator
   visit_Nodes_Column: (node) ->
     @quoteIdentifier(node.name)
 
-  visit_Nodes_SelectColumn: (node, applyAlias) ->
-    { tableName, columnName, innerTableName } = node.resolveName()
-    if innerTableName
+  visit_Nodes_SelectColumn: (node, needsAlias) ->
+    sourceTrace = node.traceSourceTable()
+    sourceTable = sourceTrace.pop()
+    outerTable = sourceTrace.shift()
+    if outerTable
       @qualifyColumnName(
-        tableName,
-        @aliasColumnName(innerTableName, columnName))
+        outerTable.name,
+        @aliasColumnName(sourceTable.name, node.name))
     else
-      sourceName = @qualifyColumnName(tableName, columnName)
-      if applyAlias
-        "#{sourceName} as #{@aliasColumnName(tableName, columnName)}"
+      sourceName = @qualifyColumnName(sourceTable.name, node.name)
+      if needsAlias
+        "#{sourceName} as #{@aliasColumnName(sourceTable.name, node.name)}"
       else
         sourceName
 

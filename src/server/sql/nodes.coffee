@@ -54,8 +54,8 @@ class Union extends Binary
 class Join
   constructor: (@left, @right, @condition) ->
 
-  resolveColumnName: (args...) ->
-    @left.resolveColumnName(args...) || @right.resolveColumnName(args...)
+  getTable: (name) ->
+    @left.getTable(name) || @right.getTable(name)
 
 class Literal
   constructor: (@value) ->
@@ -69,31 +69,23 @@ class Column
 class SelectColumn
   constructor: (@source, @tableName, @name) ->
 
-  resolveName: ->
-    @source.resolveColumnName(@tableName, @name)
+  traceSourceTable: ->
+    @source.getTable(@tableName)
 
 class Table
-  constructor: (@tableName) ->
+  constructor: (@name) ->
 
-  resolveColumnName: (tableName, columnName) ->
-    if tableName is @tableName
-      {
-        tableName: @tableName,
-        columnName: columnName,
-      }
+  getTable: (name) ->
+    [this] if name is @name
 
 class Subquery
   constructor: (@query, index) ->
     @name = "t" + index
 
-  resolveColumnName: (tableName, columnName) ->
-    innerNames = @query.table().resolveColumnName(tableName, columnName)
-    if innerNames
-      {
-        tableName: @name,
-        columnName: innerNames.columnName,
-        innerTableName: innerNames.tableName
-      }
+  getTable: (name) ->
+    innerTable = @query.table().getTable(name)
+    if innerTable
+      [this].concat(innerTable)
 
   allColumns: ->
     for column in @query.columns()
