@@ -2,7 +2,7 @@ Monarch.Json = (->
   { Relations, Expressions, Util } = Monarch
   { singularize, capitalize, camelize, underscoreAndPluralize, underscore, uncapitalize } = Util.Inflection
 
-  @serialize = Monarch.Util.Visitor.visit
+  @serialize = Monarch.Util.visit
   @parse = (json, tables) ->
     type = json.type
     method = this["parse_#{type}"]

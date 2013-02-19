@@ -1,6 +1,6 @@
 Monarch.RecordRetriever = do ->
 
-  retrieveRecords: Monarch.Util.Visitor.visit
+  retrieveRecords: Monarch.Util.visit
 
   visit_Relations_Selection: (r) ->
     _.filter(r.operand.all(), (tuple) =>

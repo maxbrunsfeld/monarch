@@ -76,7 +76,7 @@ Monarch.Events = do ->
   clear: (relation) ->
     clearEvents(relation)
 
-  visit: Monarch.Util.Visitor.visit
+  visit: Monarch.Util.visit
 
   visit_Relations_Table: (r) ->
     setupEvents(r)

@@ -1,14 +1,9 @@
 #= require ./init
 #= require ./monarch
-#= require ./util/inflection
-#= require ./util/visitor
-#= require ./util/deferrable
+#= require ./util/index
 #= require ./base
 #= require ./field
 #= require ./synthetic_field
-#= require ./expressions/predicate
-#= require ./expressions/column
-#= require_tree ./expressions
-#= require ./relations/relation
-#= require_tree ./relations
+#= require ./expressions/index
+#= require ./relations/index
 #= require_tree .

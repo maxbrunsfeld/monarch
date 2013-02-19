@@ -1,5 +1,5 @@
 { Util, CompositeTuple } = require("./core")
-{ Inflection, Visitor } = Util
+{ Inflection, visit } = Util
 { camelize } = Inflection
 
 visitProperty = (name) ->
@@ -21,7 +21,7 @@ mapFieldNames = (row, nameMap) ->
   fieldValues
 
 module.exports =
-  visit: Visitor.visit
+  visit: visit
 
   visit_Relations_Table: (r, rows) ->
     return [] if rows.length == 0

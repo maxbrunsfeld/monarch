@@ -1,13 +1,15 @@
 _ = require "underscore"
 Nodes = require "./nodes"
-Visitor = require("../core").Util.Visitor
+{ visit } = require("../core").Util
 
 visitPrimitive = (value) ->
   new Nodes.Literal(value)
 
 class QueryBuilder
-  buildQuery: Visitor.visit
-  visit: Visitor.visit
+  buildQuery: (args...) ->
+    @visit(args...)
+
+  visit: visit
 
   visit_Boolean: visitPrimitive
   visit_Number: visitPrimitive

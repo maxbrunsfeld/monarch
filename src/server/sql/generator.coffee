@@ -1,6 +1,6 @@
 _ = require "underscore"
 Nodes = require "./nodes"
-{ Visitor } = require("../core").Util
+{ visit } = require("../core").Util
 
 class Generator
   toSql: (query) ->
@@ -10,7 +10,7 @@ class Generator
     [sql, @literals]
 
   # private
-  visit: Visitor.visit
+  visit: visit
 
   visit_Insert: (node) ->
     _.compact([
