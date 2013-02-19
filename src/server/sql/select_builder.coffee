@@ -16,16 +16,16 @@ class SelectBuilder extends QueryBuilder
     unless operandQuery.canHaveOrderByAdded()
       operandQuery = wrapQuery(this, operandQuery)
     _.tap operandQuery, (query) =>
-      query.setOrderExpressions(
+      query.orderExpressions = (
         @visit(e, query.table()) for e in r.orderByExpressions)
 
   visit_Relations_Limit: (r) ->
     _.tap @visit(r.operand), (query) ->
-      query.setLimit(r.count)
+      query.limit = r.count
 
   visit_Relations_Offset: (r) ->
     _.tap @visit(r.operand), (query) ->
-      query.setOffset(r.count)
+      query.offset = r.count
 
   visit_Relations_Union: (r) ->
     new Nodes.Union(@visit(r.left), @visit(r.right))
@@ -34,16 +34,16 @@ class SelectBuilder extends QueryBuilder
     new Nodes.Difference(@visit(r.left), @visit(r.right))
 
   visit_Relations_InnerJoin: (r) ->
-    sideQueries = for side in ['left', 'right']
+    [leftQuery, rightQuery] = for side in ['left', 'right']
       operandQuery = @visit(r[side])
       if operandQuery.canHaveJoinAdded?()
         operandQuery
       else
         wrapQuery(this, operandQuery)
-    select = (sideQueries[0].columns()).concat(sideQueries[1].columns())
-    join = new Nodes.Join(sideQueries[0].table(), sideQueries[1].table())
+    columns = (leftQuery.columns()).concat(rightQuery.columns())
+    join = new Nodes.Join(leftQuery.table(), rightQuery.table())
     join.condition = @visit(r.predicate, join)
-    new Nodes.Select(join, select)
+    new Nodes.Select(join, columns)
 
   visit_Relations_Projection: (r) ->
     _.tap @visit(r.operand), (query) =>
@@ -57,7 +57,7 @@ class SelectBuilder extends QueryBuilder
 
 wrapQuery = (builder, query) ->
   subquery = new Nodes.Subquery(query, ++builder.subqueryIndex)
-  new Nodes.Select(subquery, subquery.allColumns())
+  new Nodes.Select(subquery, subquery.columns())
 
 directionString = (coefficient) ->
   if (coefficient == -1) then 'DESC' else 'ASC'

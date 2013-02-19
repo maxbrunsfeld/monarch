@@ -108,23 +108,23 @@ class Generator
     "FROM " + @visit(node.table())
 
   whereClauseSql: (node) ->
-    "WHERE #{@visit(node.condition())}" if node.condition()
+    "WHERE #{@visit(node.condition)}" if node.condition
 
   limitClauseSql: (node) ->
-    "LIMIT " + @addLiteral(node.limit()) if node.limit()
+    "LIMIT " + @addLiteral(node.limit) if node.limit
 
   offsetClauseSql: (node) ->
-    "OFFSET " + @addLiteral(node.offset()) if node.offset()
+    "OFFSET " + @addLiteral(node.offset) if node.offset
 
   orderByClauseSql: (node) ->
-    return if _.isEmpty(node.orderExpressions())
-    "ORDER BY " + @visitList(node.orderExpressions())
+    return if _.isEmpty(node.orderExpressions)
+    "ORDER BY " + @visitList(node.orderExpressions)
 
   insertClauseSql: (node) ->
-    "INSERT INTO " + @visit(node.table)
+    "INSERT INTO " + @visit(node.table())
 
   columnsClauseSql: (node) ->
-    "( #{@visitList(node.columns)} )"
+    "( #{@visitList(node.columns())} )"
 
   valuesClauseSql: (node) ->
     "VALUES " + ("( #{@visitList(list)} )" for list in node.valueLists).join(', ')
@@ -133,7 +133,7 @@ class Generator
     "UPDATE " + @visit(node.table())
 
   assignmentsClauseSql: (node) ->
-    "SET " + @visitList(node.assignments())
+    "SET " + @visitList(node.assignments)
 
   deleteClauseSql: (node) ->
     "DELETE FROM " + @visit(node.table())

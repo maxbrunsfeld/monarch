@@ -9,10 +9,10 @@ class UpdateBuilder extends QueryBuilder
       @buildTableNode(table),
       buildAssignments(this, fieldValues))
 
-buildAssignments = (builder, fieldValues) ->
-  for key, value of fieldValues
-    column = new Nodes.Column(underscore(key))
-    sqlValue = builder.visit(value)
-    new Nodes.Assignment(column, sqlValue)
+  buildAssignments = (builder, fieldValues) ->
+    for key, value of fieldValues
+      column = new Nodes.Column(underscore(key))
+      sqlValue = builder.visit(value)
+      new Nodes.Assignment(column, sqlValue)
 
 module.exports = UpdateBuilder

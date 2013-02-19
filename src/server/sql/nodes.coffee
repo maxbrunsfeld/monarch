@@ -1,42 +1,34 @@
 { Base, Util } = require("../core")
 
 class Query extends Base
-  @accessors 'table', 'condition'
-
-  addCondition: (newCondition) ->
-    @setCondition(
-      if @condition()
-        new And(@condition(), newCondition)
-      else
-        newCondition)
+  table: -> @_table
+  columns: -> @_columns
+  setTable: (x) -> @_table = x
+  setColumns: (x) -> @_columns = x
 
 class Select extends Query
   constructor: (table, columns) ->
     @setTable(table)
     @setColumns(columns)
-    @setCondition(null)
-    @setOrderExpressions([])
-
-  @accessors 'columns', 'orderExpressions', 'limit', 'offset'
+    @orderExpressions = []
 
   canHaveJoinAdded: ->
-    !(@condition()? || @limit()?)
+    !(@condition? || @limit?)
 
   canHaveOrderByAdded: ->
-    !(@limit()?)
+    !(@limit?)
 
-class Insert
-  constructor: (@table, @columns, @valueLists) ->
+class Insert extends Query
+  constructor: (table, columns, @valueLists) ->
+    @setTable(table)
+    @setColumns(columns)
 
 class Update extends Query
-  constructor: (table, assignments) ->
+  constructor: (table, @assignments) ->
     @setTable(table)
-    @setAssignments(assignments)
-
-  @accessors 'assignments'
 
 class Delete extends Query
-  constructor: (table, assignments) ->
+  constructor: (table) ->
     @setTable(table)
 
 class Binary extends Base
@@ -44,18 +36,18 @@ class Binary extends Base
 
 class And extends Binary
 class Assignment extends Binary
-class Equals extends Binary
-
 class Difference extends Binary
-  @delegate 'table', 'columns', to: 'left'
+class Equals extends Binary
 class Union extends Binary
-  @delegate 'table', 'columns', to: 'left'
+
+for klass in [Union, Difference]
+  klass.delegate 'table', 'columns', to: 'left'
 
 class Join
   constructor: (@left, @right, @condition) ->
 
-  getTable: (name) ->
-    @left.getTable(name) || @right.getTable(name)
+  traceTable: (name) ->
+    @left.traceTable(name) || @right.traceTable(name)
 
 class Literal
   constructor: (@value) ->
@@ -70,24 +62,24 @@ class SelectColumn
   constructor: (@source, @tableName, @name) ->
 
   traceSourceTable: ->
-    @source.getTable(@tableName)
+    @source.traceTable(@tableName)
 
 class Table
   constructor: (@name) ->
 
-  getTable: (name) ->
+  traceTable: (name) ->
     [this] if name is @name
 
 class Subquery
   constructor: (@query, index) ->
     @name = "t" + index
 
-  getTable: (name) ->
-    innerTable = @query.table().getTable(name)
+  traceTable: (name) ->
+    innerTable = @query.table().traceTable(name)
     if innerTable
       [this].concat(innerTable)
 
-  allColumns: ->
+  columns: ->
     for column in @query.columns()
       new SelectColumn(this, column.tableName, column.name)
 

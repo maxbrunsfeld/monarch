@@ -18,7 +18,7 @@ class QueryBuilder
 
   visit_Relations_Selection: (r, args...) ->
     _.tap @visit(r.operand, args...), (query) =>
-      query.addCondition(@visit(r.predicate, query.table()))
+      @addCondition(query, @visit(r.predicate, query.table()))
 
   visit_Expressions_And: (e, table) ->
     new Nodes.And(@visit(e.left, table), @visit(e.right, table))
@@ -28,6 +28,13 @@ class QueryBuilder
 
   visit_Expressions_Column: (e, table) ->
     new Nodes.SelectColumn(table, e.table.resourceName(), e.resourceName())
+
+  addCondition: (node, condition) ->
+    node.condition =
+      if node.condition
+        new Nodes.And(node.condition, condition)
+      else
+        condition
 
   buildTableNode: (table) ->
     new Nodes.Table(table.resourceName())

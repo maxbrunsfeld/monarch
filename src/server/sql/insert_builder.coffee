@@ -16,12 +16,12 @@ class InsertBuilder extends QueryBuilder
       buildColumns(columnNames),
       visitValueLists.call(this, valueLists))
 
-buildColumns = (columnNames) ->
-  for name in columnNames
-    new Nodes.Column(underscore(name))
+  buildColumns = (columnNames) ->
+    for name in columnNames
+      new Nodes.Column(underscore(name))
 
-visitValueLists = (valueLists) ->
-  for list in valueLists
-    @visit(value) for value in list
+  visitValueLists = (valueLists) ->
+    for list in valueLists
+      @visit(value) for value in list
 
 module.exports = InsertBuilder

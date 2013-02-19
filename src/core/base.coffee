@@ -19,16 +19,6 @@ class Monarch.Base
       do (methodName) =>
         @prototype[methodName] = (args...) -> this[to][methodName](args...)
 
-  @accessors: (methodNames...) ->
-    for methodName in methodNames
-      do (methodName) =>
-        setterName = "set" + capitalize(methodName)
-        memoizedName = "_#{methodName}"
-        @prototype[methodName] = (value) ->
-          this[memoizedName]
-        @prototype[setterName] = (value) ->
-          this[memoizedName] = value
-
   @reopen: (f) ->
     prototypeProperties = f.call(this)
     _.extend(this.prototype, prototypeProperties)
