@@ -56,10 +56,10 @@ class Generator
       @visit(node.condition)
     ].join(' ')
 
-  visit_Nodes_InsertColumn: (node) ->
+  visit_Nodes_Column: (node) ->
     @quoteIdentifier(node.name)
 
-  visit_Nodes_Column: (node, applyAlias) ->
+  visit_Nodes_SelectColumn: (node, applyAlias) ->
     { tableName, columnName, innerTableName } = node.resolveName()
     if innerTableName
       @qualifyColumnName(

@@ -1,7 +1,4 @@
 class Column
-  constructor: (@source, @tableName, @name) ->
-
-  resolveName: ->
-    @source.resolveColumnName(@tableName, @name)
+  constructor: (@name) ->
 
 module.exports = Column

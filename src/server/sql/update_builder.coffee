@@ -11,7 +11,7 @@ class UpdateBuilder extends QueryBuilder
 
 buildAssignments = (builder, fieldValues) ->
   for key, value of fieldValues
-    column = new Nodes.InsertColumn(underscore(key))
+    column = new Nodes.Column(underscore(key))
     sqlValue = builder.visit(value)
     new Nodes.Assignment(column, sqlValue)
 

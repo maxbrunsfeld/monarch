@@ -1,4 +1,4 @@
-Column = require "./column"
+SelectColumn = require("./select_column")
 
 class Subquery
   constructor: (@query, index) ->
@@ -15,6 +15,6 @@ class Subquery
 
   allColumns: ->
     for column in @query.columns()
-      new Column(this, column.tableName, column.name)
+      new SelectColumn(this, column.tableName, column.name)
 
 module.exports = Subquery

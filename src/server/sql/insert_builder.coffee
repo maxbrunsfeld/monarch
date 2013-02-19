@@ -18,7 +18,7 @@ class InsertBuilder extends QueryBuilder
 
 buildColumns = (columnNames) ->
   for name in columnNames
-    new Nodes.InsertColumn(underscore(name))
+    new Nodes.Column(underscore(name))
 
 visitValueLists = (valueLists) ->
   for list in valueLists

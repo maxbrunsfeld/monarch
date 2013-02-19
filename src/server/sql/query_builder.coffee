@@ -27,7 +27,7 @@ class QueryBuilder
     new Nodes.Equals(@visit(e.left, table), @visit(e.right, table))
 
   visit_Expressions_Column: (e, table) ->
-    new Nodes.Column(table, e.table.resourceName(), e.resourceName())
+    new Nodes.SelectColumn(table, e.table.resourceName(), e.resourceName())
 
   buildTableNode: (table) ->
     new Nodes.Table(table.resourceName())
