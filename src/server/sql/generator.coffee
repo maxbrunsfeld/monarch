@@ -12,7 +12,7 @@ class Generator
   # private
   visit: visit
 
-  visit_Insert: (node) ->
+  visit_Nodes_Insert: (node) ->
     _.compact([
       @insertClauseSql(node)
       @columnsClauseSql(node)
@@ -20,7 +20,7 @@ class Generator
       'RETURNING "id"'
     ]).join(' ')
 
-  visit_Select: (node) ->
+  visit_Nodes_Select: (node) ->
     _.compact([
       @selectClauseSql(node),
       @fromClauseSql(node),
@@ -30,36 +30,36 @@ class Generator
       @offsetClauseSql(node)
     ]).join(' ')
 
-  visit_Update: (node) ->
+  visit_Nodes_Update: (node) ->
     _.compact([
       @updateClauseSql(node)
       @assignmentsClauseSql(node)
       @whereClauseSql(node)
     ]).join(' ')
 
-  visit_Delete: (node) ->
+  visit_Nodes_Delete: (node) ->
     _.compact([
       @deleteClauseSql(node)
       @whereClauseSql(node)
     ]).join(' ')
 
-  visit_Subquery: (node) ->
+  visit_Nodes_Subquery: (node) ->
     "( #{@visit(node.query)} ) as #{@quoteIdentifier(node.name)}"
 
-  visit_Table: (node) ->
+  visit_Nodes_Table: (node) ->
     @quoteIdentifier(node.tableName)
 
-  visit_Join: (node) ->
+  visit_Nodes_Join: (node) ->
     [
-      @visit_Binary(node, "INNER JOIN")
+      @visit_Nodes_Binary(node, "INNER JOIN")
       "ON"
       @visit(node.condition)
     ].join(' ')
 
-  visit_InsertColumn: (node) ->
+  visit_Nodes_InsertColumn: (node) ->
     @quoteIdentifier(node.name)
 
-  visit_Column: (node, applyAlias) ->
+  visit_Nodes_Column: (node, applyAlias) ->
     { tableName, columnName, innerTableName } = node.resolveName()
     if innerTableName
       @qualifyColumnName(
@@ -72,23 +72,23 @@ class Generator
       else
         sourceName
 
-  visit_OrderExpression: (node) ->
+  visit_Nodes_OrderExpression: (node) ->
     "#{@visit(node.column)} #{node.directionString}"
 
-  visit_Binary: (node, operator) ->
+  visit_Nodes_Binary: (node, operator) ->
     [
       @parenthesizeIfNeeded(node.left)
       operator,
       @parenthesizeIfNeeded(node.right)
     ].join(' ')
 
-  visit_And: (node) -> @visit_Binary(node, 'AND')
-  visit_Assignment: (node) -> @visit_Binary(node, '=')
-  visit_Equals: (node) -> @visit_Binary(node, '=')
-  visit_Union: (node) -> @visit_Binary(node, 'UNION')
-  visit_Difference: (node) -> @visit_Binary(node, 'EXCEPT')
+  visit_Nodes_And: (node) -> @visit_Nodes_Binary(node, 'AND')
+  visit_Nodes_Assignment: (node) -> @visit_Nodes_Binary(node, '=')
+  visit_Nodes_Equals: (node) -> @visit_Nodes_Binary(node, '=')
+  visit_Nodes_Union: (node) -> @visit_Nodes_Binary(node, 'UNION')
+  visit_Nodes_Difference: (node) -> @visit_Nodes_Binary(node, 'EXCEPT')
 
-  visit_Literal: (node) ->
+  visit_Nodes_Literal: (node) ->
     @addLiteral(node.value)
 
   selectClauseSql: (node) ->

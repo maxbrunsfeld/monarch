@@ -1,3 +1,5 @@
+{ visit } = require("../../core").Util
+
 files = [
   "and"
   "assignment"
@@ -23,3 +25,4 @@ for file in files
   klassName = capitalize(camelize(file))
   module.exports[klassName] = klass
 
+visit.setupAll(module.exports, "Nodes")
