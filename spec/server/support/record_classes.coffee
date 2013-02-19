@@ -1,25 +1,27 @@
 root = "#{__dirname}/../../../src/server"
-Monarch = require "#{root}/index"
+defaultRepository = require("#{root}/default_repository")
+Monarch = require("#{root}/index")
 
-class Blog extends Monarch.Record
-  @extended(this)
-  @columns
-    public: 'boolean'
-    title: 'string'
-    authorId: 'integer'
+module.exports = ->
+  defaultRepository.clear()
 
-class BlogPost extends Monarch.Record
-  @extended(this)
-  @columns
-    public: 'boolean'
-    title: 'string'
-    blogId: 'integer'
+  class global.Blog extends Monarch.Record
+    @extended(this)
+    @columns
+      public: 'boolean'
+      title: 'string'
+      authorId: 'integer'
 
-class Comment extends Monarch.Record
-  @extended(this)
-  @columns
-    body: 'string'
-    blogPostId: 'integer'
-    authorId: 'integer'
+  class global.BlogPost extends Monarch.Record
+    @extended(this)
+    @columns
+      public: 'boolean'
+      title: 'string'
+      blogId: 'integer'
 
-module.exports = { Blog, BlogPost, Comment }
+  class global.Comment extends Monarch.Record
+    @extended(this)
+    @columns
+      body: 'string'
+      blogPostId: 'integer'
+      authorId: 'integer'

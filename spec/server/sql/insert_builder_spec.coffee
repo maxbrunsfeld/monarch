@@ -1,8 +1,11 @@
-{ Monarch, recordClasses } = require "../spec_helper"
-{ Blog } = recordClasses
-blogs = Blog.table
+{ Monarch } = require "../spec_helper"
 
 describe "InsertBuilder", ->
+  blogs = null
+
+  beforeEach ->
+    blogs = Blog.table
+
   describe "when passed a single hash of attributes", ->
     it "creates an insert statement with a single list of values", ->
       sql = blogs.createSql({ public: true, title: 'Blog1', authorId: 5 })

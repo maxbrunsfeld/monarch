@@ -1,9 +1,10 @@
-{ Monarch, async, recordClasses } = require "../spec_helper"
-{ Blog } = recordClasses
-blogs = Blog.table
+{ Monarch, async } = require "../spec_helper"
 
 describe "Relations.Table", ->
+  blogs = null
+
   beforeEach (done) ->
+    blogs = Blog.table
     blogs.deleteAll(done)
 
   describe "#create", ->

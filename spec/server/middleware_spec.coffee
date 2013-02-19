@@ -1,14 +1,13 @@
-{ root, Monarch, _, FakeResponse, recordClasses } = require "./spec_helper"
+{ root, Monarch, _, FakeResponse } = require "./spec_helper"
 Sandbox = require "#{root}/sandbox"
 middleware = require "#{root}/middleware"
-{ Blog } = recordClasses
 
 describe "middleware", ->
-  [req, res, next, route] = []
-
-  class TestSandbox extends Sandbox
+  [req, res, next, route, TestSandbox] = []
 
   beforeEach ->
+    class TestSandbox extends Sandbox
+
     req = { method: 'GET', headers: {} }
     res = new FakeResponse
     next = jasmine.createSpy('next')

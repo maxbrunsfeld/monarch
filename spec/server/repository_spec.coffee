@@ -1,7 +1,6 @@
-{ Monarch, root, _, recordClasses } = require "./spec_helper"
+{ Monarch, root, _ } = require "./spec_helper"
 Repository = require "#{root}/repository"
 ConnectionPool = require "#{root}/connection_pool"
-{ Blog, BlogPost } = recordClasses
 
 describe "Repository", ->
   repository = null

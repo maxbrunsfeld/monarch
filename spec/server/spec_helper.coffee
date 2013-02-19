@@ -8,7 +8,7 @@ Monarch = require "#{root}/index"
 defaultRepository = require "#{root}/default_repository"
 
 matchers = require './support/matchers'
-recordClasses = require "./support/record_classes"
+setupRecordClasses = require "./support/record_classes"
 databaseConfig = require "./support/db/#{env}"
 FakeResponse = require "./support/fake_response"
 
@@ -17,21 +17,15 @@ global.beforeAll = (f) ->
   beforeEach(_.once(f))
 
 beforeEach ->
-  reinitializeRepository()
+  setupRecordClasses()
   Monarch.configureConnection(databaseConfig)
   @addMatchers(matchers)
-
-reinitializeRepository = ->
-  defaultRepository.clear()
-  for klassName, klass of recordClasses
-    defaultRepository.registerTable(klass.table)
 
 module.exports = {
   _
   async
   root
   Monarch
-  recordClasses
   databaseConfig
   FakeResponse
 }

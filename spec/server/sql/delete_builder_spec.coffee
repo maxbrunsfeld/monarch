@@ -1,8 +1,11 @@
-{ Monarch, recordClasses } = require "../spec_helper"
-{ Blog } = recordClasses
-blogs = Blog.table
+{ Monarch } = require "../spec_helper"
 
 describe "DeleteBuilder", ->
+  blogs = null
+
+  beforeEach ->
+    blogs = Blog.table
+
   describe "tables", ->
     it "constructs a delete statement", ->
       sql = blogs.deleteSql()

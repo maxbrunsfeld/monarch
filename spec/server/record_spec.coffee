@@ -1,8 +1,7 @@
-{ Monarch, async, root, recordClasses } = require "./spec_helper"
+{ Monarch, async, root } = require "./spec_helper"
 Repository = require "#{root}/repository"
 Transaction = require "#{root}/transaction"
 defaultRepository = require "#{root}/default_repository"
-{ Blog } = recordClasses
 
 describe "Record", ->
   beforeEach (done) ->

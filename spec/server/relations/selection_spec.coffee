@@ -1,11 +1,10 @@
-{ Monarch, async, recordClasses } = require "../spec_helper"
-{ Blog } = recordClasses
-blogs = Blog.table
+{ Monarch, async } = require "../spec_helper"
 
 describe "Relations.Selection", ->
-  selection = null
+  [blogs, selection] = []
 
   beforeEach (done) ->
+    blogs = Blog.table
     selection = blogs.where(authorId: 5)
     blogs.deleteAll(done)
 

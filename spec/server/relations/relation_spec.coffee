@@ -1,12 +1,14 @@
-{ Monarch, async, _, recordClasses, fixtureData } = require "../spec_helper"
+{ Monarch, async, _, fixtureData } = require "../spec_helper"
 { Relation } = Monarch.Relations
-{ Blog, BlogPost, Comment } = recordClasses
-blogs = Blog.table
-blogPosts = BlogPost.table
-comments = Comment.table
 
 describe "Relation", ->
+  [blogs, blogPosts, comments] = []
+
   beforeEach (done) ->
+    blogs = Blog.table
+    blogPosts = BlogPost.table
+    comments = Comment.table
+
     async.series([
       (f) -> Blog.table.deleteAll(f),
       (f) -> BlogPost.table.deleteAll(f),

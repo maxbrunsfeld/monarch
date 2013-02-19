@@ -1,10 +1,13 @@
-{ Monarch, recordClasses } = require "../spec_helper"
-{ Blog, BlogPost, Comment } = recordClasses
-blogs = Blog.table
-blogPosts = BlogPost.table
-comments = Comment.table
+{ Monarch } = require "../spec_helper"
 
 describe "SelectBuilder", ->
+  [blogs, blogPosts, comments] = []
+
+  beforeEach ->
+    blogs = Blog.table
+    blogPosts = BlogPost.table
+    comments = Comment.table
+
   describe "tables", ->
     it "constructs a table query", ->
       expect(blogPosts.readSql()).toBeLikeQuery("""

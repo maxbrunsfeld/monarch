@@ -1,8 +1,6 @@
-{ root, Monarch, _, async, recordClasses } = require "./spec_helper"
+{ root, Monarch, _, async } = require "./spec_helper"
 Sandbox = require "#{root}/sandbox"
 { Relations, Record } = Monarch
-{ Relation, Table } = Relations
-{ Blog, BlogPost, Comment } = recordClasses
 
 describe "Sandbox", ->
   sandbox = null
@@ -44,7 +42,7 @@ describe "Sandbox", ->
       @expose 'comments', ({ Comment }) ->
         @blogPosts().joinThrough(Comment)
 
-    sandbox = new TestSandbox(recordClasses)
+    sandbox = new TestSandbox({ Blog, BlogPost, Comment })
 
   describe "#fetch", ->
     describe "for empty relations", ->
