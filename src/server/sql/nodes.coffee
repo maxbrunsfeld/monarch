@@ -1,6 +1,6 @@
 { Base, Util } = require("../core")
 
-class Query extends Base
+class Query
   table: -> @_table
   columns: -> @_columns
   setTable: (x) -> @_table = x
@@ -71,8 +71,7 @@ class Table
     [this] if name is @name
 
 class Subquery
-  constructor: (@query, index) ->
-    @name = "t" + index
+  constructor: (@query, @name) ->
 
   traceTable: (name) ->
     innerTable = @query.table().traceTable(name)
