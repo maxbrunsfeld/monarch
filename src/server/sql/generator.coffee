@@ -77,7 +77,7 @@ class Generator
         sourceName
 
   visit_Nodes_OrderExpression: (node) ->
-    "#{@visit(node.column)} #{node.directionString}"
+    "#{@visit(node.column)} #{@directionString(node.directionCoefficient)}"
 
   visit_Nodes_Binary: (node, operator) ->
     [
@@ -178,5 +178,8 @@ class Generator
 
   quoteIdentifier: (string) ->
     '"' + string + '"'
+
+  directionString: (coefficient) ->
+    if (coefficient == -1) then 'DESC' else 'ASC'
 
 module.exports = Generator

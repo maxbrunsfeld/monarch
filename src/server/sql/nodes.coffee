@@ -53,7 +53,7 @@ class Literal
   constructor: (@value) ->
 
 class OrderExpression
-  constructor: (@column, @directionString) ->
+  constructor: (@column, @directionCoefficient) ->
 
 class Column
   constructor: (@name) ->

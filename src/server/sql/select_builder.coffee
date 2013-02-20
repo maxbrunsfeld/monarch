@@ -53,13 +53,10 @@ class SelectBuilder extends QueryBuilder
   visit_Expressions_OrderBy: (e, table) ->
     new Nodes.OrderExpression(
       @visit(e.column, table),
-      directionString(e.directionCoefficient))
+      e.directionCoefficient)
 
   wrapQuery = (builder, query) ->
     subquery = new Nodes.Subquery(query, "t#{++builder.subqueryIndex}")
     new Nodes.Select(subquery, subquery.columns())
-
-  directionString = (coefficient) ->
-    if (coefficient == -1) then 'DESC' else 'ASC'
 
 module.exports = SelectBuilder
