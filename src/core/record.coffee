@@ -59,7 +59,7 @@ class Monarch.Record extends Monarch.Base
     foreignKey = options.foreignKey ? name + "Id"
     @prototype[name] = ->
       target = @tables()[targetClassName]
-      target.find(this[foreignKey]())
+      target.find(this[foreignKey](), arguments...)
     this
 
   @defaultOrderBy: ->
@@ -83,9 +83,10 @@ class Monarch.Record extends Monarch.Base
       else
         field.setValue(arguments[0])
 
-  for methodName in ['table', 'wireRepresentation', 'contains', 'onUpdate', 'onInsert', 'onRemove',
-    'at', 'indexOf', 'where', 'join', 'union', 'difference', 'limit', 'offset', 'orderBy',
-    'find', 'size', 'getColumn', 'all', 'each', 'first', 'last', 'clear']
+  for methodName in ['table', 'wireRepresentation', 'contains', 'onUpdate',
+    'onInsert', 'onRemove', 'at', 'indexOf', 'where', 'join', 'union',
+    'difference', 'limit', 'offset', 'orderBy', 'find', 'size', 'getColumn',
+    'all', 'each', 'first', 'last', 'clear']
     do (methodName) =>
       this[methodName] = (args...) ->
         @table[methodName](args...)
