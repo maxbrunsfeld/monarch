@@ -61,9 +61,9 @@ describe "Sandbox", ->
             11: { authorId: 1, id: 11, title: "My Blog", public: true }
           })
           expect(dataset.comments).toEqual({
-            31: { blogPostId: 21, id: 31, body: "My Comment 1", authorId: 5 }
-            32: { blogPostId: 21, id: 32, body: "My Comment 2", authorId: 5 }
-            33: { blogPostId: 22, id: 33, body: "My Comment 3", authorId: 5 }
+            31: { blogPostId: 21, id: 31, body: "My Comment 1", authorId: 5, parentId: null }
+            32: { blogPostId: 21, id: 32, body: "My Comment 2", authorId: 5, parentId: null }
+            33: { blogPostId: 22, id: 33, body: "My Comment 3", authorId: 5, parentId: null }
           })
           done()
 
@@ -76,8 +76,8 @@ describe "Sandbox", ->
             21: { blogId: 11, id: 21, title: "My Post 1", public: true }
           })
           expect(dataset['comments']).toEqual({
-            31: { blogPostId: 21, id: 31, body: "My Comment 1", authorId: 5 }
-            32: { blogPostId: 21, id: 32, body: "My Comment 2", authorId: 5 }
+            31: { blogPostId: 21, id: 31, body: "My Comment 1", authorId: 5, parentId: null }
+            32: { blogPostId: 21, id: 32, body: "My Comment 2", authorId: 5, parentId: null }
           })
           done()
 

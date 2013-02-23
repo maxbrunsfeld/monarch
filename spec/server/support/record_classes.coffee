@@ -25,3 +25,4 @@ module.exports = ->
       body: 'string'
       blogPostId: 'integer'
       authorId: 'integer'
+      parentId: 'integer'

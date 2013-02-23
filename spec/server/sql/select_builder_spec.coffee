@@ -171,7 +171,8 @@ describe "SelectBuilder", ->
             "comments"."id" as comments__id,
             "comments"."body" as comments__body,
             "comments"."blog_post_id" as comments__blog_post_id,
-            "comments"."author_id" as comments__author_id
+            "comments"."author_id" as comments__author_id,
+            "comments"."parent_id" as comments__parent_id
           FROM
             ((
               SELECT
@@ -246,7 +247,8 @@ describe "SelectBuilder", ->
             "comments"."id" as comments__id,
             "comments"."body" as comments__body,
             "comments"."blog_post_id" as comments__blog_post_id,
-            "comments"."author_id" as comments__author_id
+            "comments"."author_id" as comments__author_id,
+            "comments"."parent_id" as comments__parent_id
           FROM
             ((
               SELECT
@@ -425,7 +427,8 @@ describe "SelectBuilder", ->
             "comments"."id" as comments__id,
             "comments"."body" as comments__body,
             "comments"."blog_post_id" as comments__blog_post_id,
-            "comments"."author_id" as comments__author_id
+            "comments"."author_id" as comments__author_id,
+            "comments"."parent_id" as comments__parent_id
           FROM
             (
               "blogs"
@@ -451,7 +454,8 @@ describe "SelectBuilder", ->
             "comments"."id" as comments__id,
             "comments"."body" as comments__body,
             "comments"."blog_post_id" as comments__blog_post_id,
-            "comments"."author_id" as comments__author_id
+            "comments"."author_id" as comments__author_id,
+            "comments"."parent_id" as comments__parent_id
           FROM
             "blogs"
             INNER JOIN (

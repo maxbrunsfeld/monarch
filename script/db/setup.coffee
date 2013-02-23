@@ -34,6 +34,7 @@ pg.connect config, (err, client) ->
       id integer NOT NULL DEFAULT nextval('comments_id_seq'),
       body varchar,
       author_id integer,
+      parent_id integer,
       blog_post_id integer);
     ALTER SEQUENCE "comments_id_seq" OWNED BY "comments"."id";
   """, (e) ->
