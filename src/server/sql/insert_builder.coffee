@@ -6,22 +6,22 @@ QueryBuilder = require "./query_builder"
 class InsertBuilder extends QueryBuilder
   visit_Relations_Table: (table, hashes) ->
     hashes = [hashes] unless _.isArray(hashes)
-    columnNames = _.union((_.keys(hash) for hash in hashes)...)
-    valueLists = for hash in hashes
-      for columnName in columnNames
-        hash[columnName] ? null
+    table = @buildTableNode(table)
+    columnNames = getColumnNames(hashes)
+    columns = buildColumns(columnNames)
+    valueLists = buildValueLists(this, hashes, columnNames)
+    new Nodes.Insert(table, columns, valueLists)
 
-    new Nodes.Insert(
-      @buildTableNode(table)
-      buildColumns(columnNames),
-      visitValueLists.call(this, valueLists))
+  getColumnNames = (hashes) ->
+    _.union((_.keys(hash) for hash in hashes)...)
+
+  buildValueLists = (self, hashes, columnNames) ->
+    for hash in hashes
+      for columnName in columnNames
+        self.visit(hash[columnName] ? null)
 
   buildColumns = (columnNames) ->
     for name in columnNames
       new Nodes.Column(underscore(name))
-
-  visitValueLists = (valueLists) ->
-    for list in valueLists
-      @visit(value) for value in list
 
 module.exports = InsertBuilder

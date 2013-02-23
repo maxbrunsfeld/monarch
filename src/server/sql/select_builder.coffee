@@ -7,7 +7,7 @@ class SelectBuilder extends QueryBuilder
     @subqueryIndex = 0
 
   visit_Relations_Table: (r) ->
-    table = new Nodes.Table(r.resourceName())
+    table = @buildTableNode(r)
     columns = (@visit(column, table) for column in r.columns())
     new Nodes.Select(table, columns)
 
@@ -55,8 +55,8 @@ class SelectBuilder extends QueryBuilder
       @visit(e.column, table),
       e.directionCoefficient)
 
-  wrapQuery = (builder, query) ->
-    subquery = new Nodes.Subquery(query, "t#{++builder.subqueryIndex}")
+  wrapQuery = (self, query) ->
+    subquery = new Nodes.Subquery(query, "t#{++self.subqueryIndex}")
     new Nodes.Select(subquery, subquery.columns())
 
 module.exports = SelectBuilder
