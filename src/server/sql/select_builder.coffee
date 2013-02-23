@@ -50,6 +50,9 @@ class SelectBuilder extends QueryBuilder
       query.setColumns(
         @visit(column, query.table()) for column in r.table.columns())
 
+  visit_Relations_Alias: ->
+    @visit_Relations_Table.apply(this, arguments)
+
   visit_Expressions_OrderBy: (e, table) ->
     new Nodes.OrderExpression(
       @visit(e.column, table),

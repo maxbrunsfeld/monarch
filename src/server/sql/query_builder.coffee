@@ -27,7 +27,7 @@ class QueryBuilder
     new Nodes.Equals(@visit(e.left, table), @visit(e.right, table))
 
   visit_Expressions_Column: (e, table) ->
-    new Nodes.SelectColumn(table, e.table.resourceName(), e.resourceName())
+    new Nodes.SelectColumn(table, getTableAlias(this, e.table), e.resourceName())
 
   addCondition: (node, condition) ->
     node.condition =
@@ -36,7 +36,18 @@ class QueryBuilder
       else
         condition
 
-  buildTableNode: (table) ->
-    new Nodes.Table(table.resourceName())
+  buildTableNode: (r) ->
+    new Nodes.Table(r.resourceName(), getTableAlias(this, r))
+
+  getTableAlias = (self, table) ->
+    tableName = table.resourceName()
+    self.aliasesByTable ?= {}
+    aliases = self.aliasesByTable[tableName] ?= {}
+    aliases[table.alias] ?= do ->
+      index = _.size(aliases)
+      if index == 0
+        tableName
+      else
+        "#{tableName}#{index + 1}"
 
 module.exports = QueryBuilder

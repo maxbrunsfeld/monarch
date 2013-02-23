@@ -2,6 +2,9 @@ class Monarch.Expressions.Column
   constructor: (@table, @name, @type) ->
     @qualifiedName = @table.name + "." + @name
 
+  clone: (table) ->
+    new @constructor(table, @name, @type)
+
   buildLocalField: (record) ->
     new Monarch.LocalField(record, this)
 

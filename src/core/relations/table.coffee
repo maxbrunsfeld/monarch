@@ -19,6 +19,9 @@ class Monarch.Relations.Table extends Monarch.Relations.Relation
   syntheticColumn: (name, definition) ->
     @columnsByName[name] = new Monarch.Expressions.SyntheticColumn(this, name, definition)
 
+  alias: ->
+    new Monarch.Relations.Alias(this)
+
   getColumn: (name) ->
     parts = name.split('.')
     if parts.length == 2

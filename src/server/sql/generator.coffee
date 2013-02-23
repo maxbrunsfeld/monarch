@@ -46,10 +46,13 @@ class Generator
     ]).join(' ')
 
   visit_Nodes_Subquery: (node) ->
-    "( #{@visit(node.query)} ) as #{@quoteIdentifier(node.name)}"
+    "( #{@visit(node.query)} ) as #{@quoteIdentifier(node.alias)}"
 
   visit_Nodes_Table: (node) ->
-    @quoteIdentifier(node.name)
+    if node.alias && node.alias isnt node.realName
+      "#{@quoteIdentifier(node.realName)} AS #{@quoteIdentifier(node.alias)}"
+    else
+      @quoteIdentifier(node.realName)
 
   visit_Nodes_Join: (node) ->
     [
@@ -61,18 +64,17 @@ class Generator
   visit_Nodes_Column: (node) ->
     @quoteIdentifier(node.name)
 
-  visit_Nodes_SelectColumn: (node, needsAlias) ->
+  visit_Nodes_SelectColumn: (node, inSelectList) ->
     sourceTrace = node.traceSourceTable()
-    sourceTable = sourceTrace.pop()
+    originalTable = sourceTrace.pop()
     outerTable = sourceTrace.shift()
+    fullColumnName = @aliasColumnName(originalTable.alias, node.name)
     if outerTable
-      @qualifyColumnName(
-        outerTable.name,
-        @aliasColumnName(sourceTable.name, node.name))
+      @qualifyColumnName(outerTable.alias, fullColumnName)
     else
-      sourceName = @qualifyColumnName(sourceTable.name, node.name)
-      if needsAlias
-        "#{sourceName} as #{@aliasColumnName(sourceTable.name, node.name)}"
+      sourceName = @qualifyColumnName(originalTable.alias, node.name)
+      if inSelectList
+        "#{sourceName} as #{fullColumnName}"
       else
         sourceName
 

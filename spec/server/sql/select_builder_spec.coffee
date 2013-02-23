@@ -465,6 +465,30 @@ describe "SelectBuilder", ->
               ON "blogs"."id" = "blog_posts"."blog_id"
         """)
 
+    describe "joins where the same table occurs more than once", ->
+      it "generates an alias", ->
+        childComments = comments.alias()
+        relation = comments.join(childComments,
+          childComments.getColumn('parentId').eq(comments.getColumn('id')))
+        expect(relation.readSql()).toBeLikeQuery("""
+          SELECT
+            "comments"."id" as comments__id,
+            "comments"."body" as comments__body,
+            "comments"."blog_post_id" as comments__blog_post_id,
+            "comments"."author_id" as comments__author_id,
+            "comments"."parent_id" as comments__parent_id,
+            "comments2"."id" as comments2__id,
+            "comments2"."body" as comments2__body,
+            "comments2"."blog_post_id" as comments2__blog_post_id,
+            "comments2"."author_id" as comments2__author_id,
+            "comments2"."parent_id" as comments2__parent_id
+          FROM
+            "comments"
+            INNER JOIN
+            "comments" AS "comments2"
+            ON "comments2"."parent_id" = "comments"."id"
+        """)
+
   describe "projections", ->
     it "constructs a projected join query", ->
       relation = blogs.joinThrough(blogPosts)

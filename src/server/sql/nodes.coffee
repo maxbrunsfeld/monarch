@@ -65,13 +65,13 @@ class SelectColumn
     @source.traceTable(@tableName)
 
 class Table
-  constructor: (@name) ->
+  constructor: (@realName, @alias) ->
 
   traceTable: (name) ->
-    [this] if name is @name
+    [this] if name is @alias
 
 class Subquery
-  constructor: (@query, @name) ->
+  constructor: (@query, @alias) ->
 
   traceTable: (name) ->
     innerTable = @query.table().traceTable(name)
