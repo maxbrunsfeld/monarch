@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "async": "0.1.22",
-    "coffee-script": "1.3.x",
+    "coffee-script": "1.5.x",
     "pg": "0.12.x",
     "underscore": "1.4.x"
   },
