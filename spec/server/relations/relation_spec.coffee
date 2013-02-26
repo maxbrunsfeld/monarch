@@ -271,6 +271,35 @@ describe "Relation", ->
               ])
             done()
 
+      describe "with the same table occurring thrice", ->
+        it "builds correctly nested composite tuples", (done) ->
+          childComments = comments.alias()
+          grandChildComments = comments.alias()
+
+          relation =
+            comments
+            .join(childComments,
+              childComments.getColumn('parentId').eq(comments.getColumn('id')))
+            .join(grandChildComments,
+              grandChildComments.getColumn('parentId').eq(childComments.getColumn('id')))
+
+          relation.all (err, tuples) ->
+            leftTuples = (t.left for t in tuples)
+            rightTuples = (t.right for t in tuples)
+
+            expect(leftTuples).toEqualCompositeTuples(
+              Comment, [
+                { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1, parentId: null }
+              ],
+              Comment, [
+                { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1, parentId: 1 }
+              ])
+            expect(rightTuples).toEqualRecords(
+              Comment, [
+                { id: 4, body: 'Comment4', blogPostId: 2, authorId: 1, parentId: 2 }
+              ])
+            done()
+
     describe "projections", ->
       it "builds a the right record class", (done) ->
         blogs.joinThrough(blogPosts).all (err, records) ->

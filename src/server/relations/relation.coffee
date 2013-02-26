@@ -20,7 +20,7 @@ module.exports = (Relation) ->
       [string, literals] = @readSql()
       @connection().query string, literals, (err, result) =>
         return f(err) if err
-        f(null, TupleBuilder.visit(this, result.rows))
+        f(null, (new TupleBuilder).visit(this, result.rows))
 
     at: (index, f) ->
       @offset(index).first(f)
