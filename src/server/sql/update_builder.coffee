@@ -6,7 +6,7 @@ QueryBuilder = require "./query_builder"
 class UpdateBuilder extends QueryBuilder
   visit_Relations_Table: (table, fieldValues) ->
     new Nodes.Update(
-      @buildTableNode(table),
+      @getTableNode(table),
       buildAssignments(this, fieldValues))
 
   buildAssignments = (builder, fieldValues) ->

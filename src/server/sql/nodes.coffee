@@ -46,8 +46,8 @@ for klass in [Union, Difference]
 class Join
   constructor: (@left, @right, @condition) ->
 
-  traceTable: (name) ->
-    @left.traceTable(name) || @right.traceTable(name)
+  findSourceFor: (table) ->
+    @left.findSourceFor(table) || @right.findSourceFor(table)
 
 class Literal
   constructor: (@value) ->
@@ -59,28 +59,24 @@ class Column
   constructor: (@name) ->
 
 class SelectColumn
-  constructor: (@source, @tableName, @name) ->
-
-  traceSourceTable: ->
-    @source.traceTable(@tableName)
+  constructor: (source, @originalTable, @name) ->
+    @source = source.findSourceFor(originalTable)
 
 class Table
   constructor: (@realName, @alias) ->
 
-  traceTable: (name) ->
-    [this] if name is @alias
+  findSourceFor: (table) ->
+    table if table is this
 
 class Subquery
   constructor: (@query, @alias) ->
 
-  traceTable: (name) ->
-    innerTable = @query.table().traceTable(name)
-    if innerTable
-      [this].concat(innerTable)
+  findSourceFor: (table) ->
+    this if @query.table().findSourceFor(table)
 
   columns: ->
     for column in @query.columns()
-      new SelectColumn(this, column.tableName, column.name)
+      new SelectColumn(this, column.originalTable, column.name)
 
 class CreateTable
   constructor: (@tableName, @columnDefinitions) ->

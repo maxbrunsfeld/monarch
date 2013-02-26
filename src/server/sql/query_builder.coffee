@@ -18,7 +18,7 @@ class QueryBuilder
 
   visit_Relations_Selection: (r, args...) ->
     _.tap @visit(r.operand, args...), (query) =>
-      @addCondition(query, @visit(r.predicate, query.table()))
+      addCondition(query, @visit(r.predicate, query.table()))
 
   visit_Expressions_And: (e, table) ->
     new Nodes.And(@visit(e.left, table), @visit(e.right, table))
@@ -27,27 +27,27 @@ class QueryBuilder
     new Nodes.Equals(@visit(e.left, table), @visit(e.right, table))
 
   visit_Expressions_Column: (e, table) ->
-    new Nodes.SelectColumn(table, getTableAlias(this, e.table), e.resourceName())
+    new Nodes.SelectColumn(table, @getTableNode(e.table), e.resourceName())
 
-  addCondition: (node, condition) ->
+  getTableNode: (r) ->
+    tableName = r.resourceName()
+    nodesForTable(this, tableName)[r.alias] ?=
+      new Nodes.Table(tableName, nextAliasFor(this, tableName))
+
+  addCondition = (node, condition) ->
     node.condition =
       if node.condition
         new Nodes.And(node.condition, condition)
       else
         condition
 
-  buildTableNode: (r) ->
-    new Nodes.Table(r.resourceName(), getTableAlias(this, r))
+  nextAliasFor = (self, tableName) ->
+    index = _.size(nodesForTable(self, tableName))
+    suffix = if (index > 0) then (index + 1) else ""
+    "#{tableName}#{suffix}"
 
-  getTableAlias = (self, table) ->
-    tableName = table.resourceName()
-    self.aliasesByTable ?= {}
-    aliases = self.aliasesByTable[tableName] ?= {}
-    aliases[table.alias] ?= do ->
-      index = _.size(aliases)
-      if index == 0
-        tableName
-      else
-        "#{tableName}#{index + 1}"
+  nodesForTable = (self, tableName) ->
+    self.nodesByTableAndAlias ?= {}
+    self.nodesByTableAndAlias[tableName] ?= {}
 
 module.exports = QueryBuilder

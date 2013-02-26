@@ -65,18 +65,16 @@ class Generator
     @quoteIdentifier(node.name)
 
   visit_Nodes_SelectColumn: (node, inSelectList) ->
-    sourceTrace = node.traceSourceTable()
-    originalTable = sourceTrace.pop()
-    outerTable = sourceTrace.shift()
-    fullColumnName = @aliasColumnName(originalTable.alias, node.name)
-    if outerTable
-      @qualifyColumnName(outerTable.alias, fullColumnName)
-    else
-      sourceName = @qualifyColumnName(originalTable.alias, node.name)
+    { source, originalTable, name } = node
+    disambiguatedName = @aliasColumnName(originalTable.alias, name)
+    if source is originalTable
+      qualifiedName = @qualifyColumnName(originalTable.alias, name)
       if inSelectList
-        "#{sourceName} as #{fullColumnName}"
+        "#{qualifiedName} as #{disambiguatedName}"
       else
-        sourceName
+        qualifiedName
+    else
+      @qualifyColumnName(source.alias, disambiguatedName)
 
   visit_Nodes_OrderExpression: (node) ->
     "#{@visit(node.column)} #{@directionString(node.directionCoefficient)}"

@@ -6,7 +6,7 @@ QueryBuilder = require "./query_builder"
 class InsertBuilder extends QueryBuilder
   visit_Relations_Table: (table, hashes) ->
     hashes = [hashes] unless _.isArray(hashes)
-    table = @buildTableNode(table)
+    table = @getTableNode(table)
     columnNames = getColumnNames(hashes)
     columns = buildColumns(columnNames)
     valueLists = buildValueLists(this, hashes, columnNames)

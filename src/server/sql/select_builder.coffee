@@ -7,7 +7,7 @@ class SelectBuilder extends QueryBuilder
     @subqueryIndex = 0
 
   visit_Relations_Table: (r) ->
-    table = @buildTableNode(r)
+    table = @getTableNode(r)
     columns = (@visit(column, table) for column in r.columns())
     new Nodes.Select(table, columns)
 
