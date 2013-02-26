@@ -52,7 +52,7 @@ describe "SelectBuilder", ->
       """, [true, 1])
 
   describe "orderings", ->
-    describe "an ordering on a table", ->
+    describe "on a table", ->
       it "adds the correct order by clause", ->
         relation = blogPosts.orderBy("title desc")
         expect(relation.readSql()).toBeLikeQuery("""
@@ -68,7 +68,7 @@ describe "SelectBuilder", ->
             "blog_posts"."id" ASC
         """, [])
 
-    describe "an ordering on a limit", ->
+    describe "on a limit", ->
       it "adds the correct order by clause", ->
         relation = blogPosts.limit(2).orderBy("title desc")
         expect(relation.readSql()).toBeLikeQuery("""
@@ -126,7 +126,7 @@ describe "SelectBuilder", ->
       """, [5, 2])
 
   describe "unions", ->
-    describe "a union of two selections", ->
+    describe "of two selections", ->
       it "constructs a set union query", ->
         left = blogPosts.where(blogId: 5)
         right = blogPosts.where(public: true)
@@ -157,7 +157,7 @@ describe "SelectBuilder", ->
           )
         """, [5, true])
 
-    describe "a union inside of a join", ->
+    describe "inside of a join", ->
       it "makes a correct subquery for the union", ->
         left = blogPosts.where(blogId: 5)
         right = blogPosts.where(public: true)
@@ -202,7 +202,7 @@ describe "SelectBuilder", ->
         """, [5, true])
 
   describe "differences", ->
-    describe "a difference of two selections", ->
+    describe "of two selections", ->
       it "constructs a set difference query", ->
         left = blogPosts.where(blogId: 5)
         right = blogPosts.where(public: true)
@@ -233,7 +233,7 @@ describe "SelectBuilder", ->
           )
         """, [5, true])
 
-    describe "a difference inside of a join", ->
+    describe "inside of a join", ->
       it "makes a correct subquery for the union", ->
         left = blogPosts.where(blogId: 5)
         right = blogPosts.where(public: true)
@@ -278,7 +278,7 @@ describe "SelectBuilder", ->
         """, [5, true])
 
   describe "joins", ->
-    describe "a join between two tables", ->
+    describe "between two tables", ->
       it "constructs a join query", ->
         relation = blogs.join(blogPosts)
         expect(relation.readSql()).toBeLikeQuery("""
@@ -297,7 +297,7 @@ describe "SelectBuilder", ->
               ON "blogs"."id" = "blog_posts"."blog_id"
         """)
 
-    describe "a join between a table and a limit", ->
+    describe "between a table and a limit", ->
       it "makes a subquery for a limit on the left", ->
         relation = blogs.limit(10).join(blogPosts)
         expect(relation.readSql()).toBeLikeQuery("""
@@ -354,7 +354,7 @@ describe "SelectBuilder", ->
               ON "blogs"."id" = "t1"."blog_posts__blog_id"
         """, [10])
 
-    describe "a join between a selection and a table", ->
+    describe "between a selection and a table", ->
       it "makes a subquery for a selection on the left", ->
         relation = blogs.where(public: true).join(blogPosts)
         expect(relation.readSql()).toBeLikeQuery("""
@@ -411,7 +411,7 @@ describe "SelectBuilder", ->
               ON "blogs"."id" = "t1"."blog_posts__blog_id"
         """, [true])
 
-    describe "a left-associative three-table join", ->
+    describe "with three tables, grouped left-associatively", ->
       it "generates the right sql", ->
         relation = blogs.join(blogPosts).join(comments)
         expect(relation.readSql()).toBeLikeQuery("""
@@ -438,7 +438,7 @@ describe "SelectBuilder", ->
               ON "blog_posts"."id" = "comments"."blog_post_id"
         """)
 
-    describe "a right-associative three-table join", ->
+    describe "with three tables, grouped right-associatively", ->
       it "generates the right sql", ->
         relation = blogs.join(blogPosts.join(comments))
         expect(relation.readSql()).toBeLikeQuery("""
@@ -465,7 +465,7 @@ describe "SelectBuilder", ->
               ON "blogs"."id" = "blog_posts"."blog_id"
         """)
 
-    describe "joins where the same table occurs more than once", ->
+    describe "where the same table occurs more than once", ->
       it "generates an alias", ->
         childComments = comments.alias()
         relation = comments.join(childComments,
