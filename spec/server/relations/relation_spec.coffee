@@ -25,10 +25,10 @@ describe "Relation", ->
         { id: 4, public: false, title: 'Private Post2', blogId: 2 }
       ], f),
       (f) -> Comment.table.create([
-        { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1 }
-        { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1 }
-        { id: 3, body: 'Comment3', blogPostId: 2, authorId: 1 }
-        { id: 4, body: 'Comment4', blogPostId: 2, authorId: 1 }
+        { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1, parentId: null }
+        { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1, parentId: 1 }
+        { id: 3, body: 'Comment3', blogPostId: 2, authorId: 1, parentId: 1 }
+        { id: 4, body: 'Comment4', blogPostId: 2, authorId: 1, parentId: 2 }
       ], f),
     ], done)
 
@@ -102,7 +102,7 @@ describe "Relation", ->
           done()
 
     describe "orderings", ->
-      describe "an ordering on a table", ->
+      describe "on a table", ->
         it "builds the right record class", (done) ->
           blogPosts.orderBy('id desc').all (err, records) ->
             expect(records).toEqualRecords(BlogPost, [
@@ -113,7 +113,7 @@ describe "Relation", ->
             ])
             done()
 
-      describe "an ordering on a limit", ->
+      describe "on a limit", ->
         it "adds the correct order by clause", (done) ->
           blogPosts.limit(2).orderBy('id desc').all (err, records) ->
             expect(records).toEqualRecords(BlogPost, [
@@ -141,7 +141,7 @@ describe "Relation", ->
           done()
 
     describe "joins", ->
-      describe "a join between two tables", ->
+      describe "between two tables", ->
         it "builds composite tuples with the correct left and right records", (done) ->
           blogs.join(blogPosts).all (err, tuples) ->
             sortedTuples = _.sortBy tuples, (t) -> [t.left.id(), t.right.id()]
@@ -160,7 +160,7 @@ describe "Relation", ->
               ])
             done()
 
-      describe "a join between a limit and a table", ->
+      describe "between a limit and a table", ->
         it "builds composite tuples with the correct left and right records", (done) ->
           blogs.limit(1).join(blogPosts).all (err, tuples) ->
             expect(tuples).toEqualCompositeTuples(
@@ -174,7 +174,7 @@ describe "Relation", ->
               ])
             done()
 
-      describe "a join between a selection and a table", ->
+      describe "between a selection and a table", ->
         it "builds composite tuples with the correct left and right records", (done) ->
           blogs.where(title: 'Public Blog1').join(blogPosts).all (err, tuples) ->
             expect(tuples).toEqualCompositeTuples(
@@ -188,7 +188,7 @@ describe "Relation", ->
               ])
             done()
 
-      describe "a left-associative three table join", ->
+      describe "with three tables, grouped left-associatively", ->
         it "builds composite tuples with the correct left and right records", (done) ->
           blogs.join(blogPosts).join(comments).all (err, tuples) ->
             sortedTuples = _.sortBy tuples, (t) -> [t.left.left.id(), t.left.right.id()]
@@ -217,7 +217,7 @@ describe "Relation", ->
               ])
             done()
 
-      describe "a right-associative three table join", ->
+      describe "with three tables, grouped right-associatively", ->
         it "builds composite tuples with the correct left and right records", (done) ->
           blogs.join(blogPosts.join(comments)).all (err, tuples) ->
             sortedTuples = _.sortBy tuples, (t) -> [t.left.id(), t.right.left.id()]
@@ -243,6 +243,31 @@ describe "Relation", ->
                 { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1 }
                 { id: 3, body: 'Comment3', blogPostId: 2, authorId: 1 }
                 { id: 4, body: 'Comment4', blogPostId: 2, authorId: 1 }
+              ])
+            done()
+
+      describe "with the same table occurring twice", ->
+        it "builds composite tuples with the correct left and right records", (done) ->
+          childComments = comments.alias()
+          relation = comments.join(childComments,
+            childComments.getColumn('parentId').eq(comments.getColumn('id')))
+
+          relation.all (err, tuples) ->
+            sortedTuples = _.sortBy tuples, (t) -> [t.left.id(), t.right.id()]
+            leftTuples = (t.left for t in sortedTuples)
+            rightTuples = (t.right for t in sortedTuples)
+
+            expect(leftTuples).toEqualRecords(
+              Comment, [
+                { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1, parentId: null }
+                { id: 1, body: 'Comment1', blogPostId: 1, authorId: 1, parentId: null }
+                { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1, parentId: 1 }
+              ])
+            expect(rightTuples).toEqualRecords(
+              Comment, [
+                { id: 2, body: 'Comment2', blogPostId: 1, authorId: 1, parentId: 1 }
+                { id: 3, body: 'Comment3', blogPostId: 2, authorId: 1, parentId: 1 }
+                { id: 4, body: 'Comment4', blogPostId: 2, authorId: 1, parentId: 2 }
               ])
             done()
 

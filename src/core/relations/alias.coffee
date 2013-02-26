@@ -6,6 +6,7 @@ class Monarch.Relations.Alias extends Monarch.Relations.Relation
   constructor: (@operand) ->
     @columnsByName = {}
     @name = operand.name
+    @recordClass = operand.recordClass
     @alias = "alias#{@constructor.index++}"
 
   columns: ->
